@@ -20,7 +20,7 @@
 		<storm.version>2.1.0</storm.version>
 		<snakeyaml.version>1.16</snakeyaml.version>
 <!--        <kafka.scala.version>kafka_2.10</kafka.scala.version>-->
-		<kafka.scala.version>2.4.1</kafka.scala.version>
+		<kafka.scala.version>kafka_2.13</kafka.scala.version>
 <!--		<kafka.version>0.8.2.1</kafka.version>-->
 		<kafka.version>2.4.1</kafka.version>
 <!--        <cassandra.version>2.1.11</cassandra.version>-->
@@ -37,6 +37,7 @@
 		<jackson.version>2.10.3</jackson.version>
 <!--		<slf4j.version>1.7.12</slf4j.version>-->
 		<slf4j.version>1.7.30</slf4j.version>
+		<spring.framework.version>5.2.4.RELEASE</spring.framework.version>
 		<json-simple.version>1.1.1</json-simple.version>
 <!--        <zookeeper.version>3.4.6</zookeeper.version>-->
         <!--<zookeeper.version>3.4.7</zookeeper.version>-->
@@ -72,10 +73,6 @@
 	</scm>
 
 	<repositories>
-<!--		<repository>-->
-<!--			<id>jitpack.io</id>-->
-<!--			<url>https://jitpack.io</url>-->
-<!--		</repository>-->
 		<repository>
 			<snapshots>
 				<enabled>false</enabled>
@@ -84,11 +81,16 @@
 			<name>bintray</name>
 			<url>https://jcenter.bintray.com</url>
 		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
 	</repositories>
 
 	<modules>
 		<module>rt-models</module>
 		<module>rt-rules</module>
+		<module>rt-services-data</module>
 	</modules>
 
 	<dependencyManagement>
@@ -145,8 +147,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.apache.kafka</groupId>
-                <artifactId>kafka</artifactId>
-				<!--<artifactId>kafka_2.9.2</artifactId>-->
+				<artifactId>${kafka.scala.version}</artifactId>
 				<version>${kafka.version}</version>
 				<exclusions>
 					<exclusion>
