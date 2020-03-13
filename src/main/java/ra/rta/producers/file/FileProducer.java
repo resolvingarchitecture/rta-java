@@ -16,9 +16,9 @@ public class FileProducer implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileProducer.class);
 
-	private Map<String,String> args;
+	private Map<String,Object> args;
 
-	public void init(Map<String,String> args) {
+	public void init(Map<String,Object> args) {
 	    this.args = args;
     }
 
@@ -28,10 +28,10 @@ public class FileProducer implements Runnable {
             // 16,000,000 transactions in 1 message chunks in 45 minutes with 2013 Macbook Pro using 150Mb
             // 16,000,000 transactions in 100 message chunks in 3 minutes with 2013 Macbook Pro using 300Mb
             // 16,000,000 transactions in 10,000 message chunks in 2 minutes with 2013 Macbook Pro using 1.3Gb
-            String partnerNamespace = args.get("partner");
-            String kafkaURLList = args.get("brokerList");
-            String inboundFolder = args.get("inboundFolder");
-            String archiveFolder = args.get("archiveFolder");
+            String partnerNamespace = (String)args.get("partner");
+            String kafkaURLList = (String)args.get("brokerList");
+            String inboundFolder = (String)args.get("inboundFolder");
+            String archiveFolder =(String) args.get("archiveFolder");
 
             LOG.info("Partner.name=" + partnerNamespace);
             MessageManager messageManager = new MessageManager(args);

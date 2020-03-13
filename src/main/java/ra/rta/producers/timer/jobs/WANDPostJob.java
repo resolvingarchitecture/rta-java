@@ -128,7 +128,7 @@ public class WANDPostJob implements Job {
 
 	public static void main(String[] args) throws Exception {
 		Map<String,String> properties = new HashMap<>();
-		properties.put("topology.cassandra.seednode","175.11.31.125");
+		properties.put("topology.cassandra.seednode","165.13.51.145");
 		DataServiceManager.setProperties(properties);
 		String wandPostPath = "/tmp/end/";
 

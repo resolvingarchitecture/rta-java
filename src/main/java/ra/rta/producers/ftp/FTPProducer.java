@@ -42,7 +42,7 @@ public class FTPProducer extends DefaultFtplet implements Runnable {
 		this.messageChunk = messageChunk;
 		this.transactionIdentifier = transactionIdentifier;
 		this.topicIdentifier = topicIdentifier;
-		Map<String,String> args = new HashMap<>();
+		Map<String,Object> args = new HashMap<>();
 		args.put("brokerList", messageBrokerList);
 		messageManager = new MessageManager(args);
 	}

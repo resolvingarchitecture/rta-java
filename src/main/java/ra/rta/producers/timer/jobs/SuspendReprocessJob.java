@@ -13,6 +13,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.producers.MessageManager;
 import ra.rta.services.data.DataServiceManager;
 import ra.rta.services.data.TransactionDataService;
 
@@ -43,7 +44,7 @@ public class SuspendReprocessJob implements Job {
     public void reprocess(JobDataMap map) throws Exception {
         String msg = "Transaction Suspend Reprocess Job initiated...";
         LOG.info(msg);
-        Producer transactionProducer = (Producer) map.get(KAFKA_PRODUCER);
+        MessageManager messageManager = (MessageManager) map.get(KAFKA_PRODUCER);
         String topic = (String) map.get(KAFKA_TOPIC);
         DataServiceManager dataServiceManager = (DataServiceManager)map.get(DataServiceManager.class.getSimpleName());
         Map<String, Partner> activePartners = dataServiceManager.getPartnerDataService().getAllActivePartnersMap();
@@ -61,11 +62,10 @@ public class SuspendReprocessJob implements Job {
                 transactionDataService.loadSuspended(transaction);
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 MAPPER.writeValue(os, envelope);
-                System.out.print(".");
-                transactionProducer.send(new ProducerRecord<>(topic, ""+System.currentTimeMillis(), new String(os.toByteArray())));
+                LOG.info(".");
+                messageManager.send(topic, new String(os.toByteArray()), false);
                 msg = "Transaction Suspend Reprocess Job service operation signal sent.";
                 LOG.info(msg);
-                System.out.println(msg);
             }
         }
     }

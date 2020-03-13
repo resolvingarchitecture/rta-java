@@ -6,59 +6,66 @@ import java.util.Properties;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.JobBuilder;
-import org.quartz.JobDataMap;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
-import org.quartz.SimpleScheduleBuilder;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.producers.MessageManager;
 import ra.rta.producers.timer.jobs.RFMSummarizingJob;
 
 /**
  * Schedules Jobs.
  */
-public class TimerProducer {
+public class TimerProducer implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimerProducer.class);
 
 	private Scheduler scheduler;
+	private MessageManager messageManager;
+	private Map<String,Object> props;
 
-	public static void main(String[] args) throws Exception {
-		TimerProducer timerProducer = new TimerProducer();
+	public static void main(String[] args) {
 		// Kafka Properties
-		Properties props = new Properties();
+		Map<String,Object> props = new HashMap<>();
 		// Set up props
 		props.put("metadata.broker.list", args[0]);
-		props.put("serializer.class", "kafka.serializer.StringEncoder");
-		props.put("request.required.acks", "1");
+		props.put("topic", args[1]);
+		props.put("periodicity", args[2]);
+		props.put("timeDivision1", Integer.parseInt(args[3]));
+		props.put("timeDivision2", Integer.parseInt(args[4]));
+        props.put("topology.cassandra.seednode",args[5]);
+        props.put("wandsPostPath", args[6]);
 
-		String kafkaTopic = args[1];
-		String periodicity = args[2];
-		int timeDivision1 = Integer.parseInt(args[3]);
-		int timeDivision2 = args[4] == null ? 0 : Integer.parseInt(args[4]);
-        Map<String,String> properties = new HashMap<>();
-        properties.put("topology.cassandra.seednode",args[5]);
-//        DataServiceManager dataServiceManager = new DataServiceManager(properties);
-//        String wandPostPath = args[6];
+		TimerProducer timerProducer = new TimerProducer(props);
+		timerProducer.run();
+	}
 
+	public TimerProducer(Map<String,Object> properties) {
+		props = properties;
+	}
+
+	@Override
+	public void run() {
 		LOG.info(TimerProducer.class.getSimpleName() + " starting with the following parameters:");
-        LOG.info("Kafka IP: " + args[0]);
+		LOG.info("Kafka IP: " + props.get("metadata.broker.list"));
 
-		// Create Kafka Producer
-		Producer<String, String> kafkaProducer = new KafkaProducer(properties);
+		String kafkaTopic = (String)props.get("topic");
+		String periodicity = (String)props.get("periodicity");
+		int timeDivision1 = (Integer)props.get("timeDivision1");
+		int timeDivision2 = (Integer)props.get("timeDivision2");
+		messageManager = new MessageManager(props);
 
 		// Setup Quartz Timer
 		SchedulerFactory schedFact = new org.quartz.impl.StdSchedulerFactory();
-		timerProducer.scheduler = schedFact.getScheduler();
-		timerProducer.scheduler.start();
+		try {
+			scheduler = schedFact.getScheduler();
+			scheduler.start();
+		} catch (SchedulerException e) {
+			LOG.error(e.getLocalizedMessage());
+			return;
+		}
 
-        // Schedule Suspend Reprocess Job
+		// Schedule Suspend Reprocess Job
 //        JobDataMap suspendReprocessJobDataMap = new JobDataMap();
 //        suspendReprocessJobDataMap.put(DataServiceManager.class.getSimpleName(), dataServiceManager);
 //        suspendReprocessJobDataMap.put(SuspendReprocessJob.KAFKA_TOPIC, "transaction");
@@ -74,9 +81,9 @@ public class TimerProducer {
 //                .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(4, 30))
 //                .build();
 //
-//        timerProducer.scheduler.scheduleJob(suspendReprocessJob, suspendReprocessJobTrigger);
+//        scheduler.scheduleJob(suspendReprocessJob, suspendReprocessJobTrigger);
 
-        // Schedule WAND Post Job
+		// Schedule WAND Post Job
 //        JobDataMap wandPostJobDataMap = new JobDataMap();
 //        wandPostJobDataMap.put(DataServiceManager.class.getSimpleName(), dataServiceManager);
 //        wandPostJobDataMap.put("wandPostPath",wandPostPath);
@@ -90,13 +97,13 @@ public class TimerProducer {
 //                .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(0,30))
 //                .build();
 //
-//        timerProducer.scheduler.scheduleJob(wandPostJob, wandPostJobTrigger);
+//        scheduler.scheduleJob(wandPostJob, wandPostJobTrigger);
 
 		// Schedule Summarizing Job
 		JobDataMap summarizingJobDataMap = new JobDataMap();
 		summarizingJobDataMap.put(RFMSummarizingJob.KAFKA_TOPIC, kafkaTopic);
-		summarizingJobDataMap.put(RFMSummarizingJob.KAFKA_CONFIG, properties);
-		summarizingJobDataMap.put(RFMSummarizingJob.KAFKA_PRODUCER, kafkaProducer);
+		summarizingJobDataMap.put(RFMSummarizingJob.KAFKA_CONFIG, props);
+		summarizingJobDataMap.put(RFMSummarizingJob.KAFKA_PRODUCER, messageManager);
 
 		JobDetail summarizingJob = JobBuilder.newJob(RFMSummarizingJob.class)
 				.withIdentity(RFMSummarizingJob.class.getSimpleName())
@@ -104,21 +111,26 @@ public class TimerProducer {
 				.build();
 
 		Trigger summarizingJobTrigger;
-		switch (periodicity) {
-            case "Daily": {
-                summarizingJobTrigger = TriggerBuilder.newTrigger()
-                        .withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(timeDivision1, timeDivision2))
-                        .build();
-                timerProducer.scheduler.scheduleJob(summarizingJob, summarizingJobTrigger); break;
-            }
-            case "Minutely": {
-                summarizingJobTrigger = TriggerBuilder.newTrigger()
-                        .withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(timeDivision1))
-                        .build();
-                timerProducer.scheduler.scheduleJob(summarizingJob, summarizingJobTrigger); break;
-            }
+		try {
+			switch (periodicity) {
+				case "Daily": {
+					summarizingJobTrigger = TriggerBuilder.newTrigger()
+							.withSchedule(CronScheduleBuilder.dailyAtHourAndMinute(timeDivision1, timeDivision2))
+							.build();
+					scheduler.scheduleJob(summarizingJob, summarizingJobTrigger); break;
+				}
+				case "Minutely": {
+					summarizingJobTrigger = TriggerBuilder.newTrigger()
+							.withSchedule(SimpleScheduleBuilder.repeatMinutelyForever(timeDivision1))
+							.build();
+					scheduler.scheduleJob(summarizingJob, summarizingJobTrigger); break;
+				}
+			}
+		} catch (SchedulerException e) {
+			LOG.error(e.getLocalizedMessage());
+			return;
 		}
 
-        LOG.info("Jobs Scheduled.");
+		LOG.info("Jobs Scheduled.");
 	}
 }
