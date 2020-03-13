@@ -18,7 +18,7 @@ public final class MessageManager {
     private Producer<String,String> relaxedProducer;
     private Producer<String,String> durableProducer;
 
-    public MessageManager(Map map) {
+    public MessageManager(Map<String,String> map) {
         Properties rProps = new Properties();
         rProps.put(ProducerConfig.CLIENT_ID_CONFIG, "RelaxedProducer");
         rProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, map.get("topology.kafka.broker.list"));
@@ -56,6 +56,11 @@ public final class MessageManager {
                 relaxedProducer.send(new ProducerRecord<>(topic, ""+i++, msg));
             }
         }
+    }
+
+    public void shutdown() {
+        relaxedProducer.close();
+        durableProducer.close();
     }
 
 }
