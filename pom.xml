@@ -271,13 +271,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-<!--            <version>4.3.3</version>-->
-			<version>4.5.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.esotericsoftware.kryo</groupId>
 			<artifactId>kryo</artifactId>
 			<!-- keep this version insync with what Storm uses through cabonite/chill -->
