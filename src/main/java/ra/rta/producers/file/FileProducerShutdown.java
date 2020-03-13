@@ -1,8 +1,8 @@
 package ra.rta.producers.file;
 
-import org.apache.kafka.clients.producer.Producer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.producers.MessageManager;
 
 import java.util.List;
 
@@ -11,18 +11,14 @@ public class FileProducerShutdown extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(FileProducerShutdown.class);
 
     private List<FileSplitter> fileSplitters;
-    private Producer<String, String> transactionProducer;
-    private Producer<String, String> referenceProducer;
+    private MessageManager messageManager;
     private int maxWait = 20000;
     private int waitTime = 2000;
     private int accumulatedWait = 0;
 
-    public FileProducerShutdown(List<FileSplitter> fileSplitters,
-                                Producer<String, String> transactionProducer,
-                                Producer<String, String> referenceProducer) {
+    public FileProducerShutdown(List<FileSplitter> fileSplitters, MessageManager messageManager) {
         this.fileSplitters = fileSplitters;
-        this.transactionProducer = transactionProducer;
-        this.referenceProducer = referenceProducer;
+        this.messageManager = messageManager;
     }
 
     @Override
@@ -48,8 +44,7 @@ public class FileProducerShutdown extends Thread {
                 }
             }
         } while(fileSplitters.size() < fileSplittersCompleted);
-        transactionProducer.close();
-        referenceProducer.close();
+        messageManager.shutdown();
         if(accumulatedWait < maxWait)
             LOG.info("All worker threads stopped. {} gracefully shutdown.",FileProducer.class.getSimpleName());
         else

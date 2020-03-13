@@ -7,6 +7,7 @@ import ra.rta.models.Envelope;
 import ra.rta.models.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.producers.MessageManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.LineNumberReader;
@@ -27,8 +28,7 @@ public class FileSplitter extends Thread {
     private int startingLine;
     private Path sourceDir;
     private Path archiveDir;
-    private Producer<String, String> transactionProducer;
-    private Producer<String, String> referenceProducer;
+    private MessageManager messageManager;
 
     private boolean terminate = false;
     private boolean completed = false;
@@ -39,16 +39,14 @@ public class FileSplitter extends Thread {
                         int startingLine,
                         Path sourceDir,
                         Path archiveDir,
-                        Producer<String, String> transactionProducer,
-                        Producer<String, String> referenceProducer) {
+                        MessageManager messageManager) {
         this.partnerNamespace = partnerNamespace;
         this.dataFileName = dataFileName;
         this.markerFileName = markerFileName;
         this.startingLine = startingLine;
         this.sourceDir = sourceDir;
         this.archiveDir = archiveDir;
-        this.transactionProducer = transactionProducer;
-        this.referenceProducer = referenceProducer;
+        this.messageManager = messageManager;
     }
 
     public void terminate() {
@@ -98,11 +96,7 @@ public class FileSplitter extends Thread {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 MAPPER.writeValue(os, envelope);
                 LOG.info(".");
-                if("transaction".equals(topic)) {
-                    transactionProducer.send(new ProducerRecord<>(topic, ""+i++, new String(os.toByteArray())));
-                } else {
-                    referenceProducer.send(new ProducerRecord<>(topic, ""+i++, new String(os.toByteArray())));
-                }
+                messageManager.send(topic, new String(os.toByteArray()), !"transaction".equals(topic));
                 Files.write(markerFile,(lineNumberReader.getLineNumber()+"").getBytes());
                 totalNumLinesSent++;
             }
