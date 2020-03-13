@@ -1,4 +1,4 @@
-package ra.rta.topologies.bolts;
+package ra.rta.bolts;
 
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;

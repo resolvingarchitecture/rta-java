@@ -1,4 +1,4 @@
-package ra.rta.topologies.bolts;
+package ra.rta.bolts;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;

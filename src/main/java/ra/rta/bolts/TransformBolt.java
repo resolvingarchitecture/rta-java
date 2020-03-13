@@ -1,4 +1,4 @@
-package ra.rta.topologies.bolts;
+package ra.rta.bolts;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -3,7 +3,8 @@ package ra.rta.topologies;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.storm.kafka.spout.KafkaSpout;
 import org.apache.storm.topology.TopologyBuilder;
-import ra.rta.topologies.bolts.TesterBolt;
+import ra.rta.Main;
+import ra.rta.bolts.TesterBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

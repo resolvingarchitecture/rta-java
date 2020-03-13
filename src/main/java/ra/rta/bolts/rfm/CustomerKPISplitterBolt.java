@@ -1,4 +1,4 @@
-package ra.rta.topologies.bolts.rfm;
+package ra.rta.bolts.rfm;
 
 import java.util.*;
 

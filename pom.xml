@@ -393,27 +393,27 @@
 			<!--                    <mainClass>io.onemfive.OneMFivePlatform</mainClass>-->
 			<!--                </configuration>-->
 			<!--            </plugin>-->
-			<!--			<plugin>-->
-			<!--				<artifactId>maven-assembly-plugin</artifactId>-->
-			<!--				<executions>-->
-			<!--					<execution>-->
-			<!--						<phase>package</phase>-->
-			<!--						<goals>-->
-			<!--							<goal>single</goal>-->
-			<!--						</goals>-->
-			<!--					</execution>-->
-			<!--				</executions>-->
-			<!--				<configuration>-->
-			<!--					<archive>-->
-			<!--						<manifest>-->
-			<!--							<mainClass>io.resolvingarchitecture.Main</mainClass>-->
-			<!--						</manifest>-->
-			<!--					</archive>-->
-			<!--					<descriptorRefs>-->
-			<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
-			<!--					</descriptorRefs>-->
-			<!--				</configuration>-->
-			<!--			</plugin>-->
+						<plugin>
+							<artifactId>maven-assembly-plugin</artifactId>
+							<executions>
+								<execution>
+									<phase>package</phase>
+									<goals>
+										<goal>single</goal>
+									</goals>
+								</execution>
+							</executions>
+							<configuration>
+								<archive>
+									<manifest>
+										<mainClass>ra.rta.Main</mainClass>
+									</manifest>
+								</archive>
+								<descriptorRefs>
+									<descriptorRef>jar-with-dependencies</descriptorRef>
+								</descriptorRefs>
+							</configuration>
+						</plugin>
 			<!--			<plugin>-->
 			<!--				<groupId>org.apache.maven.plugins</groupId>-->
 			<!--				<artifactId>maven-project-info-reports-plugin</artifactId>-->
