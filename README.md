@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/resolvingarchitecture/rta.svg?branch=master)](https://travis-ci.com/resolvingarchitecture/rta)
+[![Maven Version](https://maven-badges.herokuapp.com/maven-central/resolvingarchitecture/rta/badge.svg)](http://search.maven.org/#search|gav|1|g:"resolvingarchitecture"%20AND%20a:"rta")
 
 # RTA - Real-Time Analytics
 General RTA implementation using Kafka, Storm, Cassandra.
