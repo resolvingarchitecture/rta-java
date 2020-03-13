@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.com/resolvingarchitecture/rta.svg?branch=master)](https://travis-ci.com/resolvingarchitecture/rta)
 
 # RTA - Real-Time Analytics
-General RTA implementation using Kafka, Storm, Cassandra
+General RTA implementation using Kafka, Storm, Cassandra.
+
+Newly upgraded to latest libraries as of March 2020...not deployed and tested yet.
 
 ## Version
 
@@ -23,7 +25,7 @@ General RTA implementation using Kafka, Storm, Cassandra
 
 ## [Implementation](https://github.com/resolvingarchitecture/rta)
 
-The application is written in Java using JDK 1.10 although some components may support older versions.
+The application is written in Java using JDK 1.10 although some components do support older versions (1.7).
 
 ## Integrations
 
