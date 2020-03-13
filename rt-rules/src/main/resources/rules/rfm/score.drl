@@ -1,0 +1,76 @@
+package rfm;
+dialect  "mvel"
+
+import com.segmint.models.*;
+
+rule "top tritile recency"
+    when
+        $c: Customer()
+        $k: KPI(recency >= KPIPartnerSummary.recencyBucket3Floor) from $c.KPIS
+    then
+        $k.recencyScore = 3;
+end
+
+rule "middle tritile recency"
+    when
+        $c: Customer()
+        $k: KPI(recency >= KPIPartnerSummary.recencyBucket2Floor && recency < KPIPartnerSummary.recencyBucket3Floor) from $c.KPIS
+    then
+        $k.recencyScore = 2;
+end
+
+rule "lowest tritile recency"
+    when
+        $c: Customer()
+        $k: KPI(recency < KPIPartnerSummary.recencyBucket2Floor) from $c.KPIS
+    then
+        $k.recencyScore = 1;
+end
+
+rule "top tritile frequency"
+    when
+        $c: Customer()
+        $k: KPI((frequency + KPICustomerSummary.frequency) >= KPIPartnerSummary.frequencyBucket3Floor) from $c.KPIS
+    then
+        $k.frequencyScore = 3;
+end
+
+rule "middle tritile frequency"
+    when
+        $c: Customer()
+        $k: KPI(((frequency + KPICustomerSummary.frequency) >= KPIPartnerSummary.frequencyBucket2Floor) && ((frequency + KPICustomerSummary.frequency) < KPIPartnerSummary.frequencyBucket3Floor)) from $c.KPIS
+    then
+        $k.frequencyScore = 2;
+end
+
+rule "lowest tritile frequency"
+    when
+        $c: Customer()
+        $k: KPI((frequency + KPICustomerSummary.frequency) < KPIPartnerSummary.frequencyBucket2Floor) from $c.KPIS
+    then
+        $k.frequencyScore = 1;
+end
+
+rule "top tritile monetary"
+    when
+        $c: Customer()
+        $k: KPI((monetary + KPICustomerSummary.monetary) >= KPIPartnerSummary.monetaryBucket3Floor) from $c.KPIS
+    then
+        $k.monetaryScore = 3;
+end
+
+rule "middle tritile monetary"
+    when
+        $c: Customer()
+        $k: KPI(((monetary + KPICustomerSummary.monetary) >= KPIPartnerSummary.monetaryBucket2Floor) && ((monetary + KPICustomerSummary.monetary) < KPIPartnerSummary.monetaryBucket3Floor)) from $c.KPIS
+    then
+        $k.monetaryScore = 2;
+end
+
+rule "lowest tritile monetary"
+    when
+        $c: Customer()
+        $k: KPI((monetary + KPICustomerSummary.monetary) < KPIPartnerSummary.monetaryBucket2Floor) from $c.KPIS
+    then
+        $k.monetaryScore = 1;
+end

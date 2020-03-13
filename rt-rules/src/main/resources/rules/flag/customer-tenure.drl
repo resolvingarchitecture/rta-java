@@ -1,0 +1,48 @@
+package flag;
+dialect  "mvel"
+
+import ra.rta.models.*;
+import java.util.GregorianCalendar
+import java.util.Calendar;
+
+rule "New to 3 months customer tenure"
+    when
+        $c: Customer(openDateMonths <= 3)
+    then
+        $c.addKPI(4356254325, $c.processDate);
+end
+
+rule "Over 3 to 6 months customer tenure"
+    when
+        $c: Customer(openDateMonths > 3 && openDateMonths <= 6)
+    then
+        $c.addKPI(235425455, $c.processDate);
+end
+
+rule "Over 6 to 18 months customer tenure"
+    when
+        $c: Customer(openDateMonths > 6 && openDateMonths <= 18)
+    then
+        $c.addKPI(643265423643, $c.processDate);
+end
+
+rule "Over 18 to 60 months customer tenure"
+    when
+        $c: Customer(openDateMonths > 18 && openDateMonths <= 60)
+    then
+        $c.addKPI(6436424632, $c.processDate);
+end
+
+rule "Over 60 to 84 months customer tenure"
+    when
+        $c: Customer(openDateMonths > 60 && openDateMonths <= 84)
+    then
+        $c.addKPI(34623464624, $c.processDate);
+end
+
+rule "Over 84 months customer tenure"
+    when
+        $c: Customer(openDateMonths > 84)
+    then
+        $c.addKPI(623462643, $c.processDate);
+end

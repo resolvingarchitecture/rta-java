@@ -1,0 +1,13 @@
+package ra.rta.rules.flag.p2;
+dialect  "mvel"
+
+import ra.rta.models.*;
+
+rule "child age p2"
+    salience -20
+    when
+        $p: Partner(name == "p2")
+        $c: Customer(age >= 0 && age <= 20)
+    then
+        $c.addKPI(4775427457, $c.processDate);
+end
