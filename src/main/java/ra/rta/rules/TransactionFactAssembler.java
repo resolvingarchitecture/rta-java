@@ -1,6 +1,5 @@
 package ra.rta.rules;
 
-import ra.rta.models.Account;
 import ra.rta.models.Entity;
 import ra.rta.models.Transaction;
 
@@ -27,16 +26,6 @@ public class TransactionFactAssembler {
         if (transaction == null) return facts;
 
         facts.add(transaction);
-        // Now walk down tree adding each node directly so that the entire tree
-        // is also flattened
-
-        // Add Account
-        facts.addAll(transaction.getAccounts());
-
-        // Add Customers
-        for(Account account : transaction.getAccounts()) {
-            facts.add(account.getCustomer());
-        }
 
         return facts;
     }

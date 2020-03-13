@@ -31,7 +31,6 @@ public final class Customer extends Entity {
 
 	private Partner partner;
 	private Set<KPI> KPIS = new HashSet<>();
-	private List<Account> accounts = new ArrayList<>();
 	private List<CustomerInteraction> customerInteractions = new ArrayList<>();
 	private List<Application> applications = new ArrayList<>();
 
@@ -137,14 +136,6 @@ public final class Customer extends Entity {
 
 	public void setKPIS(Set<KPI> KPIS) {
 		this.KPIS = KPIS;
-	}
-
-	public List<Account> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(List<Account> accounts) {
-		this.accounts = accounts;
 	}
 
     public List<CustomerInteraction> getCustomerInteractions() {

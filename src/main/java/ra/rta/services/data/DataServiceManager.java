@@ -10,8 +10,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 
 /**
- * {Purpose of This Class} TODO: Swap internals with Spring
- * Cassandra Created by Brian on 8/25/15
+ *
  */
 public final class DataServiceManager {
 
@@ -19,7 +18,6 @@ public final class DataServiceManager {
 
 	private static Cluster cluster;
 	private static CustomerDataService customerDataService;
-	private static AccountDataService accountDataService;
 	private static ErrorsDataService errorsDataService;
 	private static PartnerDataService partnerDataService;
 	private static RFMSummaryDataService rfmSummaryDataService;
@@ -52,7 +50,6 @@ public final class DataServiceManager {
 			@SuppressWarnings("resource")
 			Session session = cluster.connect();
 			customerDataService = new CustomerDataService(session);
-			accountDataService = new AccountDataService(session);
 			errorsDataService = new ErrorsDataService(session);
 			rfmSummaryDataService = new RFMSummaryDataService(session);
 			transactionDataService = new TransactionDataService(session);
@@ -70,10 +67,6 @@ public final class DataServiceManager {
 		if (cluster != null) {
 			cluster.close();
 		}
-	}
-
-	public static AccountDataService getAccountDataService() {
-		return accountDataService;
 	}
 
 	public static CustomerDataService getCustomerDataService() {

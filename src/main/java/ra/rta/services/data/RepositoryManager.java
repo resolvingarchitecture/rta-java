@@ -12,7 +12,7 @@ public class RepositoryManager {
 
 	public RepositoryManager(Cluster cluster) {
 		@SuppressWarnings("resource")
-		Session session = cluster.connect("sgmt");
+		Session session = cluster.connect("ra");
 		CassandraTemplate template = new CassandraTemplate(session);
 		CassandraRepositoryFactory repoFactory = new CassandraRepositoryFactory(template);
 		partnerRepo = repoFactory.getRepository(PartnerRepository.class);

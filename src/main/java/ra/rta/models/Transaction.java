@@ -26,8 +26,6 @@ public abstract class Transaction extends Entity {
         Unknown, Check, ACH, OverdraftFee, OnlineBillpay, Mobile, POS, ATM, Teller
     }
 
-    // Currently multiple accounts can be associated with a Transaction although each will have the same UAIC yet different ADICs.
-	protected Set<Account> accounts = new HashSet<>();
 	private LinkedHashSet<KPI> KPIS = new LinkedHashSet<>();
 
     // One UAIC per Transaction
@@ -45,14 +43,6 @@ public abstract class Transaction extends Entity {
 	private String memo;
 	private String payee;
     private boolean suspended = false;
-
-	public Set<Account> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(Set<Account> accounts) {
-		this.accounts = accounts;
-	}
 
 	public LinkedHashSet<KPI> getKPIS() {
 		return KPIS;

@@ -3,7 +3,6 @@ package ra.rta.rules;
 import java.util.ArrayList;
 import java.util.List;
 
-import ra.rta.models.Account;
 import ra.rta.models.Application;
 import ra.rta.models.Customer;
 import ra.rta.models.Entity;
@@ -34,10 +33,6 @@ public class CustomerFactAssembler {
 			facts.add(application);
 		}
 
-		// Add Accounts
-		for (Account account : customer.getAccounts()) {
-			facts.add(account);
-		}
 		return facts;
 	}
 

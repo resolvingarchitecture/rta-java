@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ra.rta.models.*;
-import ra.rta.services.business.tasks.DepositTransactionEnricher;
 import ra.rta.services.business.tasks.TransactionClassifier;
 
 /**
@@ -33,7 +32,7 @@ public abstract class TransactionEvent extends BaseEvent implements Classifiable
 	@Override
 	public List<Enricher> getEnrichers() {
 		List<Enricher> enrichers = new ArrayList<>();
-		enrichers.add(new DepositTransactionEnricher());
+		// add enrichers here
 		return enrichers;
 	}
 

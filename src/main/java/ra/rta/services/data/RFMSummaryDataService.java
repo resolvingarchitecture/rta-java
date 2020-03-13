@@ -66,12 +66,12 @@ public class RFMSummaryDataService extends BaseDataService {
         return summary;
     }
 
-    public KPICustomerSummary getLatestKPICustomerSummary(Partner partner, UUID adic, int termcode) {
+    public KPICustomerSummary getLatestKPICustomerSummary(Partner partner, UUID adid, int termcode) {
         KPICustomerSummary summary = new KPICustomerSummary();
         summary.setPartner(partner);
-        summary.setAdId(adic);
+        summary.setAdId(adid);
         summary.setTermcode(termcode);
-        ResultSet rs = session.execute(new SimpleStatement("SELECT date, frequency, monetary, recency FROM " + partner.getName() + ".customer_KPI_rfm_windowed WHERE adic = " + adic + " AND termcode = " + termcode + " limit 1;"));
+        ResultSet rs = session.execute(new SimpleStatement("SELECT date, frequency, monetary, recency FROM " + partner.getName() + ".customer_KPI_rfm_windowed WHERE adid = " + adid + " AND termcode = " + termcode + " limit 1;"));
         Row row = rs.one();
         if (row != null) {
             summary.setDate(row.getInt("date"));

@@ -1,16 +1,13 @@
 package ra.rta.bolts;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.models.Account;
 import ra.rta.models.Customer;
-import ra.rta.models.DepositTransaction;
 import ra.rta.models.Entity;
 import ra.rta.models.Event;
 import ra.rta.models.EventException;
@@ -38,30 +35,7 @@ public class PublishBolt extends BaseEventEndBolt {
 		Entity entity = event.getEntity();
 		if(entity instanceof Transaction) {
 			Transaction transaction = (Transaction)entity;
-			Set<Account> accounts = transaction.getAccounts();
-			if(accounts.size() > 0) {
-				for(Account account : accounts) {
-					Customer customer = account.getCustomer();
-					if (customer == null) {
-						EventException eventException = new EventException(PublishBolt.class.getSimpleName(), 100, account.getUaId(), event);
-						DataServiceManager.getErrorsDataService().save(eventException, event);
-					} else {
-//						DataServiceManager.getCustomerDataService().saveKPI(customer, account, true);
-						// messageManager.send("customerKPIs",
-						// MAPPER.writeValueAsString(customer), true);
-						if (entity instanceof DepositTransaction) {
-							((DepositTransaction)entity).setAdId(customer.getAdId());
-							DataServiceManager.getTransactionDataService().save((DepositTransaction) entity);
-						} else {
-							EventException eventException = new EventException(PublishBolt.class.getSimpleName(), 101, entity.getClass().getName(), event);
-							DataServiceManager.getErrorsDataService().save(eventException, event);
-						}
-					}
-				}
-			} else {
-				EventException eventException = new EventException(PublishBolt.class.getSimpleName(), 102, transaction.getId().toString(), event);
-				DataServiceManager.getErrorsDataService().save(eventException, event);
-			}
+			// publish transaction...
 		} else {
 			EventException eventException = new EventException(PublishBolt.class.getSimpleName(), 103, entity.getClass().getName(), event);
 			DataServiceManager.getErrorsDataService().save(eventException, event);
