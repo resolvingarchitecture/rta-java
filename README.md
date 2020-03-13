@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/resolvingarchitecture/rta.svg?branch=master)](https://travis-ci.com/resolvingarchitecture/rta)
 
 # RTA - Real-Time Analytics
+General RTA implementation using Kafka, Storm, Cassandra
 
 ## Version
 
