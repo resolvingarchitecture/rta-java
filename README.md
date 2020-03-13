@@ -8,7 +8,7 @@ Newly upgraded to latest libraries as of March 2020...not deployed and tested ye
 
 ## Version
 
-0.5.0
+0.5.1
 
 ## Authors / Developers
 
