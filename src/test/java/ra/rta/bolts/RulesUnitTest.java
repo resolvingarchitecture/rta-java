@@ -15,11 +15,11 @@ public class RulesUnitTest {
 //        Transaction transaction = new Transaction();
 //        transaction.setStatus("Posted");
 //        account.getTransactions().add(transaction);
-//        KPI KPI = new KPI();
-//        KPI.setTermcode("1050");
-//        KPI.setFrequency(1);
-//        KPI.setRecency(2);
-//        KPI.setMonetary(2);
+//        KPI kpi = new KPI();
+//        kpi.setTermcode("1050");
+//        kpi.setFrequency(1);
+//        kpi.setRecency(2);
+//        kpi.setMonetary(2);
 //        KPI partnerKPISummary = new KPI();
 //        partnerKPISummary.setRecencyBucket2Floor(2);
 //        partnerKPISummary.setRecencyBucket3Floor(4);
@@ -39,8 +39,8 @@ public class RulesUnitTest {
 //        facts.add(customer);
 //        facts.add(transaction);
 //
-//        new RuleRunner().runRules("/Users/Brian/Projects/SGMT/FiveO/com.segmint.rt/com.segmint.rt.topologies/src/test/resources/", facts);
+//        new RuleRunner().runRules("src/test/resources/", facts);
 //
-//        System.out.println("1050: "+ customer.getKPIs().contains("1050"));
+//        System.out.println("332131: "+ customer.getKPIs().contains("4314241421"));
     }
 }

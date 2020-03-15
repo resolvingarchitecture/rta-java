@@ -52,7 +52,7 @@ public class PartnerSplitterBolt extends BaseRichBolt {
 					host.getDatacenter(), host.getAddress(), host.getRack());
 		}
 		session = cluster.connect();
-		partnerLookupStatement = new BoundStatement(session.prepare("SELECT name FROM sgmt.partner;"));
+		partnerLookupStatement = new BoundStatement(session.prepare("SELECT name FROM ra.partner;"));
 	}
 
 	@Override

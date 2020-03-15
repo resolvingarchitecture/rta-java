@@ -24,9 +24,9 @@ public class TransformerFactory {
     public Transformer build(String partnerName, Event event) throws Exception {
         String className = allActivePartners.get(partnerName).getFormatters().get(event.getClass().getSimpleName());
         if(className==null) {
-            throw new Exception("Transformer class not found for event: "+event.getClass().getSimpleName()+". Please add to sgmt.partner.formatters");
+            throw new Exception("Transformer class not found for event: "+event.getClass().getSimpleName()+". Please add to ra.partner.formatters");
         } else {
-            BaseTransformer transformer = (BaseTransformer)Class.forName("com.segmint.rt.services.business.tasks."+className).newInstance();
+            BaseTransformer transformer = (BaseTransformer)Class.forName("ra.rta.services.business.tasks."+className).newInstance();
             String command = event.getEnvelope().getHeader().getCommand();
             Map<String,Map<String,Object>> fieldMetaMap = transformMap.get(partnerName).get(command);
             if(fieldMetaMap==null) {
