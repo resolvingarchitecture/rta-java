@@ -4,7 +4,8 @@
 # RTA - Real-Time Analytics
 General RTA implementation using Kafka, Storm, Cassandra.
 
-Newly upgraded to latest libraries as of March 2020...not deployed and tested yet.
+Newly upgraded to latest libraries as of March 2020...NOT DEPLOYED NOR TESTED YET. Will not run yet as it is being refactored
+into a form for more general use.
 
 ## Version
 
