@@ -1,0 +1,60 @@
+package rfm;
+dialect  "mvel"
+
+import ra.rta.models.*;
+import org.slf4j.Logger;
+
+global Logger logger;
+
+rule "RFM Inactive Customer Filter"
+    salience 30
+    when
+       $c: Customer(status != Customer.Status.Active)
+    then
+       $c.kpis.clear();
+       logger.debug(drools.getRule().getName() + " - clearing KPIs for UCID " + $c.getUcId() + " status " + $c.getStatus());
+end
+
+rule "RFM Inactive Deposit Account Filter"
+    salience 20
+    when
+      $t: DepositTransaction()
+      $a: DepositAccount(status != DepositAccount.Status.Open) from $t.accounts
+      $c: Customer() from $a.identity
+    then
+      $c.kpis.clear();
+      logger.debug(drools.getRule().getName() + " - clearing KPIs for UCID " + $c.getUcId() + " account status " + $a.getStatus());
+end
+
+rule "RFM Suspended Transaction Filter"
+    salience 10
+    when
+        $t: Transaction(suspended == true)
+        $a: Account() from $t.accounts
+        $c: Customer() from $a.identity
+    then
+       $c.kpis.clear();
+       logger.debug(drools.getRule().getName() + " - clearing KPIs for UCID " + $c.getUcId() + " financialTransaction " + $t.getId() + " is suspended");
+end
+
+rule "RFM Unprocessed Transaction Filter"
+    salience 10
+    when
+        $t: Transaction(status != Transaction.Status.Processed)
+        $a: Account() from $t.accounts
+        $c: Customer() from $a.identity
+    then
+        $c.kpis.clear();
+        logger.debug(drools.getRule().getName() + " - clearing KPIs for UCID " + $c.getUcId() + " financialTransaction " + $t.getId() + " status " + $t.getStatus());
+end
+
+rule "RFM skip deposit financialTransaction filter"
+	salience 10
+	when
+		$t: DepositTransaction(type == Transaction.Type.NonPost || type == Transaction.Type.Waived || type == Transaction.Type.TruthInSavings || type == Transaction.Type.System)
+		$a: Account() from $t.accounts
+        $c: Customer() from $a.identity
+	then
+		$c.kpis.clear();
+		logger.debug(drools.getRule().getName() + " - clearing KPIs for UCID " +  $c.getUcId() + " financialTransaction " + $t.getId() + " type " + $t.getType());
+end

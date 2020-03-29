@@ -1,0 +1,13 @@
+package rfm;
+dialect  "mvel"
+
+import ra.rta.models.*;
+
+rule "rfm KPI activate"
+    salience -10
+    when
+        $c: Customer()
+        $KPI: KPI((recencyScore + frequencyScore + monetaryScore) >= 6) from $c.KPIS
+    then
+        $KPI.active = true;
+end

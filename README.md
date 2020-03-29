@@ -1,19 +1,20 @@
-[![Build Status](https://travis-ci.com/resolvingarchitecture/rta.svg?branch=master)](https://travis-ci.com/resolvingarchitecture/rta)
-[![Maven Version](https://maven-badges.herokuapp.com/maven-central/resolvingarchitecture/rta/badge.svg)](http://search.maven.org/#search|gav|1|g:"resolvingarchitecture"%20AND%20a:"rta")
+[![Build Status](https://travis-ci.com/resolvingarchitecture/rta-java.svg?branch=master)](https://travis-ci.com/resolvingarchitecture/rta-java)
+[![Maven Version](https://maven-badges.herokuapp.com/maven-central/resolvingarchitecture/rta-java/badge.svg)](http://search.maven.org/#search|gav|1|g:"resolvingarchitecture"%20AND%20a:"rta-java")
 
 # RTA - Real-Time Analytics
-General RTA implementation using Kafka, Storm, Cassandra.
+General RTA implementation using Storm with Kafka, Cassandra, Neo4J, MongoDB, PostgreSQL, and other components.
 
-Newly upgraded to latest libraries as of March 2020...NOT DEPLOYED NOR TESTED YET. Will not run yet as it is being refactored
-into a form for more general use.
+Newly upgraded to latest libraries as of March 2020...NOT DEPLOYED NOR TESTED YET. 
+Will not run yet as it is being refactored into a form for more general use.
 
 ## Version
 
-0.5.1
+0.5.2-SNAPSHOT
 
 ## Authors / Developers
 
-* Brian Taylor - [GitHub](https://github.com/objectorange) | [LinkedIn](https://www.linkedin.com/in/decentralizationarchitect/) | brian@resolvingarchitecture.io PGP: 2FA3 9B12 DA50 BD7C E43C 3031 A15D FABB 2579 77DC
+* Brian Taylor - [GitHub](https://github.com/objectorange) | [LinkedIn](https://www.linkedin.com/in/decentralizationarchitect/) 
+| brian@resolvingarchitecture.io PGP: 2FA3 9B12 DA50 BD7C E43C 3031 A15D FABB 2579 77DC
 
 ## Opportunities
 
@@ -36,4 +37,31 @@ The application is written in Java using JDK 1.10 although some components do su
 
 
 ## Support
+
+
+## Installation
+
+### Ubuntu 18.04 LTS
+
+### OpenJDK11
+https://www.ubuntu18.com/ubuntu-install-openjdk-11/
+
+### Kafka
+https://www.digitalocean.com/community/tutorials/how-to-install-apache-kafka-on-ubuntu-18-04
+sudo systemctl start kafka
+sudo systemctl status kafka
+sudo journalctl -u kafka
+sudo systemctl enable kafka
+sudo systemctl stop kafka
+kafkat partitions
+
+### Storm
+
+### Neo4J
+
+### MongoDB
+
+### Cassandra
+
+### PostgreSQL
 

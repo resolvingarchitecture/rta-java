@@ -1,0 +1,14 @@
+package core;
+dialect "mvel"
+
+import ra.rta.models.*;
+
+rule "core KPI activate"
+    salience -10
+    when
+        $e: Event()
+        $i: Identity() from $e.identity
+        $kpi: KPI() from $i.kpis
+    then
+        $kpi.active = true;
+end

@@ -1,0 +1,35 @@
+package flag;
+dialect  "mvel"
+
+import ra.rta.models.*;
+
+rule "coppa opt-out"
+	// this needs to run after everything else
+	salience -9999
+	when
+		$c: Customer(age < 18)
+	then
+		$c.getKPIs().clear();
+		$c.addKPI(2634243264);
+end
+
+rule "remove coppa opt-out"
+	when
+		$c: Customer(age >=18)
+	then
+		$c.removeKPI(236462432);
+end
+
+rule "glba opt-out"
+	when
+		$c: Customer(glbaOptOut > 0)
+	then
+		$c.addKPI(23642643);
+end
+
+rule "remove glba opt-out"
+when
+		$c: Customer(glbaOptOut == 0 || glbaOptOut == null)
+	then
+		$c.removeKPI(2646436);
+end

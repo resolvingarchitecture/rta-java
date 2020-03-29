@@ -1,0 +1,78 @@
+package flag;
+dialect  "mvel"
+
+import ra.rta.models.*;
+import java.util.GregorianCalendar
+import java.util.Calendar;
+
+rule "1 month loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths <= 1) from $a
+    then
+        $c.addKPI(6246326436);
+end
+
+rule "2 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths == 2) from $a
+    then
+        $c.addKPI(43264326);
+end
+
+rule "3 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths == 3) from $a
+    then
+        $c.addKPI(2643642);
+end
+
+rule "4 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths == 4) from $a
+    then
+        $c.addKPI(2643263);
+end
+
+rule "6 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths > 4 && openDateMonths <= 6) from $a
+    then
+        $c.addKPI(64326432);
+end
+
+rule "12 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths > 6 && openDateMonths <= 12) from $a
+    then
+        $c.addKPI(26643632);
+end
+
+rule "24 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths > 12 && openDateMonths <= 24) from $a
+    then
+        $c.addKPI(26426432);
+end
+
+rule "36 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths > 24 && openDateMonths <= 36) from $a
+    then
+        $c.addKPI(26436432);
+end
+
+rule "gt 36 months loan recency"
+    when
+        $c: Customer($a : accounts)
+        LoanAccount(openDateMonths > 36) from $a
+    then
+        $c.addKPI(26366326);
+end

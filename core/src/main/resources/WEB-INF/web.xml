@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+		 version="2.4">
+  	<!-- Standard Action Servlet Configuration (with debugging) -->
+  	<servlet>
+    	<servlet-name>producer</servlet-name>
+    	<servlet-class>ra.rta.sources.http.HTTPSource</servlet-class>
+    	<init-param>
+      		<param-name>metadata.broker.list</param-name>
+      		<param-value>localhost:9092</param-value>
+    	</init-param>
+		<init-param>
+			<param-name>topic</param-name>
+			<param-value>event</param-value>
+		</init-param>
+		<init-param>
+			<param-name>durable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>groupId</param-name>
+			<param-value>1</param-value>
+		</init-param>
+    	<load-on-startup>1</load-on-startup>
+  	</servlet>
+
+    <!-- Standard Action Servlet Mapping -->
+  	<servlet-mapping>
+    	<servlet-name>producer</servlet-name>
+    	<url-pattern>*.process</url-pattern>
+  	</servlet-mapping>
+
+</web-app>

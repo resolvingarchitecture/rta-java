@@ -1,0 +1,16 @@
+package ra.rta.rules.flag.p1;
+dialect  "mvel"
+
+import ra.rta.models.*;
+
+rule "teen age p1"
+    salience -10
+    when
+        $p: Partner(name == "p1")
+        $c: Customer(age >= 13 && age <= 20)
+    then
+        $c.addKPI(4535443435, $c.processDate);
+        // Remove potential priors
+        $c.removeKPI(532545);
+        $c.removeKPI(524535);
+end
