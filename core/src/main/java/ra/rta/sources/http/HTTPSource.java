@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ra.rta.MessageManager;
 import ra.rta.models.Event;
+import ra.rta.transform.JSONTransformer;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
 
@@ -26,7 +27,7 @@ class HTTPSource extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(HTTPSource.class);
 
-  private long groupId;
+  private long sourceId;
   private String topic;
   private boolean durable = false;
   private MessageManager messageManager;
@@ -43,19 +44,18 @@ class HTTPSource extends HttpServlet {
     messageManager = new MessageManager(params);
     topic = (String)params.get("topic");
     durable = (Boolean)params.get("durable");
-    groupId = (Integer)params.get("groupId");
+    sourceId = (Long)params.get("sourceId");
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     super.doPost(req, resp);
     Event event = new Event();
-    event.command = Integer.parseInt(req.getRequestURI());
     event.id = RandomUtil.nextRandomLong();
-    event.groupId = groupId;
-    event.payload.put("topic",topic);
-    event.payload.put("durable",durable);
+    event.sourceId = sourceId;
+    event.commandId = Integer.parseInt(req.getRequestURI());
     if (req.getContentType().contains("application/json")) {
+      event.payloadTransformerClass = JSONTransformer.class.getName();
       StringBuilder sb = new StringBuilder();
       String line;
       BufferedReader reader = req.getReader();
@@ -69,8 +69,7 @@ class HTTPSource extends HttpServlet {
         resp.flushBuffer();
         return;
       }
-      event.payload.put("line",sb.toString());
-
+      event.rawPayload = sb.toString().getBytes();
       try {
         LOG.info(".");
         messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);

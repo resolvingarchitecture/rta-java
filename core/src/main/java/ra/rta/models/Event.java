@@ -1,17 +1,19 @@
 package ra.rta.models;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  *
  */
 public class Event implements Serializable {
+
     static final long serialVersionUID = 1L;
     public long id = 0;
-    public long groupId = 0;
-    public int command = 0;
-    public Map<String,Object> payload = new HashMap<>();
-    public boolean save = false;
+    public long sourceId = 0;
+    public int commandId = 0;
+    public byte[] rawPayload;
+    public String payloadTransformerClass;
+    public Map<String,Object> payload;
+
 }

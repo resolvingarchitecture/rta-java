@@ -6,7 +6,7 @@ public class FWTransformer extends BaseTransformer {
 
 	@Override
 	protected void select() throws Exception {
-		String body = new String(raw);
+		String body = new String(event.rawPayload);
 		for (String fieldName : fieldMetaMap.keySet()) {
 			Map<String, Object> fieldMetaPropertyMap = fieldMetaMap.get(fieldName);
 			int startPosition = (Integer) fieldMetaPropertyMap.get("select_start_position") - 1;

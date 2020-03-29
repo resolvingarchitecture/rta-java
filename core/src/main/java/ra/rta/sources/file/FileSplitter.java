@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ra.rta.MessageManager;
 import ra.rta.models.Event;
 import ra.rta.utilities.JSONUtil;
+import ra.rta.utilities.RandomUtil;
 
 import java.io.LineNumberReader;
 import java.nio.charset.StandardCharsets;
@@ -16,9 +17,10 @@ public class FileSplitter extends Thread {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileSplitter.class);
 
-    private long groupId;
+    private long sourceId;
     private Path dataFileName;
     private Path markerFileName;
+    private String payloadTransformerClass;
     private int startingLine;
     private Path sourceDir;
     private Path archiveDir;
@@ -27,16 +29,18 @@ public class FileSplitter extends Thread {
     private boolean terminate = false;
     private boolean completed = false;
 
-    public FileSplitter(long groupId,
+    public FileSplitter(long sourceId,
                         Path dataFileName,
                         Path markerFileName,
+                        String payloadTransformerClass,
                         int startingLine,
                         Path sourceDir,
                         Path archiveDir,
                         MessageManager messageManager) {
-        this.groupId = groupId;
+        this.sourceId = sourceId;
         this.dataFileName = dataFileName;
         this.markerFileName = markerFileName;
+        this.payloadTransformerClass = payloadTransformerClass;
         this.startingLine = startingLine;
         this.sourceDir = sourceDir;
         this.archiveDir = archiveDir;
@@ -79,11 +83,10 @@ public class FileSplitter extends Thread {
                     continue; // Fast-forward to starting line
                 }
                 Event event = new Event();
-                event.groupId = groupId;
-                event.command = command;
-                event.payload.put("topic",topic);
-                event.payload.put("durable",durable);
-                event.payload.put("line",line);
+                event.id = RandomUtil.nextRandomLong();
+                event.sourceId = sourceId;
+                event.rawPayload = line.getBytes();
+                event.payloadTransformerClass = payloadTransformerClass;
                 // Add message
                 LOG.info(".");
                 messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);

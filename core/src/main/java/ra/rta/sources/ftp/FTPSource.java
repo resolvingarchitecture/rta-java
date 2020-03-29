@@ -37,19 +37,26 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 
 	private FtpletContext ftpletContext;
 	private MessageManager messageManager;
-	private int groupId = 0;
-	private int command = 0;
+	private long sourceId = 0;
+	private int commandId = 0;
 	private String topic;
+	private String payloadTransformerClass;
 	private boolean durable = false;
-	private int batchSize = 1;
 	private int port;
 
-	public FTPSource(int port, int batchSize, String messageBrokerList, int groupId, int command, String topic, boolean durable) {
+	public FTPSource(int port,
+					 int batchSize,
+					 String messageBrokerList,
+					 long sourceId,
+					 int commandId,
+					 String topic,
+					 String payloadTransformerClass,
+					 boolean durable) {
 		this.port = port;
-		this.batchSize = batchSize;
-		this.groupId = groupId;
-		this.command = command;
+		this.sourceId = sourceId;
+		this.commandId = commandId;
 		this.topic = topic;
+		this.payloadTransformerClass = payloadTransformerClass;
 		this.durable = durable;
 		Map<String,Object> args = new HashMap<>();
 		args.put("topology.kafka.broker.list", messageBrokerList);
@@ -58,13 +65,13 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 
 	public void init(String... args) {
 		Map<String,Object> params = new HashMap<>();
-		port = Integer.parseInt(args[0]);
-		batchSize = Integer.parseInt(args[1]);
-		params.put("topology.kafka.broker.list", args[2]);
-		groupId = Integer.parseInt(args[3]);
-		command = Integer.parseInt(args[4]);
-		topic = args[5];
-		durable = "durable".equals(args[6]);
+		int i=0;
+		port = Integer.parseInt(args[i++]);
+		params.put("topology.kafka.broker.list", args[i++]);
+		sourceId = Long.parseLong(args[i++]);
+		commandId = Integer.parseInt(args[i++]);
+		topic = args[i++];
+		durable = "durable".equals(args[i++]);
 		messageManager = new MessageManager(params);
 	}
 
@@ -120,29 +127,15 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 		File file = new File(userRoot + currDir + fileName);
 		try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsolutePath()))) {
 			String line;
-			int current = 0;
-			List<Event> batch = new ArrayList<>();
 			while ((line = br.readLine()) != null) {
 				Event event = new Event();
-				event.command = command;
 				event.id = RandomUtil.nextRandomLong();
-				event.groupId = groupId;
-				event.payload.put("topic",topic);
-				event.payload.put("durable",durable);
-				event.payload.put("line",line);
-				current++;
-				if(current==batchSize) {
-					if(batchSize>1) {
-						messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(batch), durable);
-						batch.clear();
-					} else {
-						messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
-					}
-					current = 0;
-					LOG.info(".");
-				} else {
-					batch.add(event);
-				}
+				event.sourceId = sourceId;
+				event.commandId = commandId;
+				event.rawPayload = line.getBytes();
+				event.payloadTransformerClass = payloadTransformerClass;
+				messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
+				LOG.info(".");
 			}
 		} catch (IOException e) {
 			LOG.warn(e.getLocalizedMessage());

@@ -8,7 +8,7 @@ public class EDITransformer extends BaseTransformer {
 
     @Override
     protected void select() throws Exception {
-        String body = new String(raw);
+        String body = new String(event.rawPayload);
         List<String> rawValues = null;
         for(String fieldName : fieldMetaMap.keySet()) {
             Map<String,Object> fieldMetaPropertyMap = fieldMetaMap.get(fieldName);

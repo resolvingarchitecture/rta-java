@@ -28,11 +28,13 @@ public class FileSource implements Runnable {
             // 16,000,000 transactions in 1 message chunks in 45 minutes with 2013 Macbook Pro using 150Mb
             // 16,000,000 transactions in 100 message chunks in 3 minutes with 2013 Macbook Pro using 300Mb
             // 16,000,000 transactions in 10,000 message chunks in 2 minutes with 2013 Macbook Pro using 1.3Gb
-            int groupId = (Integer)args.get("groupId");
+            long sourceId = (Long)args.get("sourceId");
             String inboundFolder = (String)args.get("inboundFolder");
-            String archiveFolder =(String) args.get("archiveFolder");
+            String archiveFolder = (String) args.get("archiveFolder");
+            // Full path of class as String, e.g.: ra.rta.transform.CSVTransformer
+            String payloadTransformerClass = (String)args.get("payloadTransformerClass");
 
-            LOG.info("Group.id=" + groupId);
+            LOG.info("sourceId=" + sourceId);
             MessageManager messageManager = new MessageManager(args);
 
             // Register Shutdown Hook with File Splitter list
@@ -73,7 +75,15 @@ public class FileSource implements Runnable {
                             String msg = "Resuming " + dataFile.toString() + " from failure with starting line: " + startingLine;
                             LOG.info(msg);
                             // Fast Forward processing of data file to next line to process and continue processing
-                            FileSplitter fileSplitter = new FileSplitter(groupId, dataFile.getFileName(), markerFile.getFileName(), startingLine, sourceDir, archiveDir, messageManager);
+                            FileSplitter fileSplitter = new FileSplitter(
+                                    sourceId,
+                                    dataFile.getFileName(),
+                                    markerFile.getFileName(),
+                                    payloadTransformerClass,
+                                    startingLine,
+                                    sourceDir,
+                                    archiveDir,
+                                    messageManager);
                             fileSplitters.add(fileSplitter);
                             fileSplitter.start();
                         }
@@ -131,7 +141,15 @@ public class FileSource implements Runnable {
                     File markerFile = new File(dateFileName.toString() + ".mkr");
                     markerFile.createNewFile();
                     Path markerFileName = markerFile.toPath();
-                    FileSplitter fileSplitter = new FileSplitter(groupId, dateFileName, markerFileName, 0, sourceDir, archiveDir, messageManager);
+                    FileSplitter fileSplitter = new FileSplitter(
+                            sourceId,
+                            dateFileName,
+                            markerFileName,
+                            payloadTransformerClass,
+                            0,
+                            sourceDir,
+                            archiveDir,
+                            messageManager);
                     fileSplitters.add(fileSplitter);
                     fileSplitter.start();
                 }

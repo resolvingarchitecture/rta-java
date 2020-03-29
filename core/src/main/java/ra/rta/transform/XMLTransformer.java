@@ -15,7 +15,7 @@ public class XMLTransformer extends BaseTransformer {
     protected void select() throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new ByteArrayInputStream(raw));
+        Document document = builder.parse(new ByteArrayInputStream(event.rawPayload));
         XPath xPath = XPathFactory.newInstance().newXPath();
         for(String fieldNameXpath : fieldMetaMap.keySet()) {
             fieldNameValues.put(fieldNameXpath, xPath.compile(fieldNameXpath).evaluate(document, XPathConstants.STRING));

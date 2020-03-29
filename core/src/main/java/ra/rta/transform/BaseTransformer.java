@@ -1,12 +1,9 @@
 package ra.rta.transform;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import ra.rta.models.Event;
-import org.apache.commons.beanutils.BeanUtilsBean;
-import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.converters.DateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,40 +14,13 @@ public abstract class BaseTransformer implements Transformer {
 	static Logger LOG = LoggerFactory.getLogger(BaseTransformer.class);
 
 	protected Map<String, Map<String, Object>> fieldMetaMap;
-	protected byte[] raw;
+	protected Event event;
 	protected Map<String, Object> fieldNameValues = new HashMap<>();
 	protected Map<String, Object> fieldValuesMapped = new HashMap<>();
-	protected Event event;
-
-	private final BeanUtilsBean beanUtilsBean = new BeanUtilsBean(new ConvertUtilsBean() {
-		@Override
-		@SuppressWarnings("unchecked")
-		public Object convert(String value, Class clazz) {
-			if (clazz.isEnum()) {
-				if (value == null || value.trim().length() == 0) {
-					return null;
-				}
-				try {
-                    value = value.trim();
-					return Enum.valueOf(clazz, value);
-				} catch (IllegalArgumentException realException) {
-//					LOG.warn("Unknown Enum constant " + value + " for " + clazz.getCanonicalName());
-					try {
-						return Enum.valueOf(clazz, "Unknown");
-					} catch (IllegalArgumentException e) {
-                        LOG.warn("Unknown Enum constant " + value + " for " + clazz.getCanonicalName()+" and class doesn't support Unknown value.");
-						return null;
-					}
-				}
-			}
-			return super.convert(value, clazz);
-		}
-	});
 
 	public BaseTransformer() {
 		DateConverter dateConverter = new DateConverter();
 		dateConverter.setPatterns(DateUtility.knownFormats());
-		beanUtilsBean.getConvertUtils().register(dateConverter, Date.class);
 	}
 
 	public void setFieldMetaMap(Map<String, Map<String, Object>> fieldMetaMap) {
@@ -58,8 +28,8 @@ public abstract class BaseTransformer implements Transformer {
 	}
 
 	@Override
-	public final Event transform(@SuppressWarnings("hiding") byte[] data) throws Exception {
-		raw = data;
+	public final void transform(@SuppressWarnings("hiding") Event event) throws Exception {
+		this.event = event;
 		select();
 		clean();
         concatenate();
@@ -67,7 +37,6 @@ public abstract class BaseTransformer implements Transformer {
 		format();
 		substitute();
 		map();
-		return event;
 	}
 
 	protected abstract void select() throws Exception;
@@ -164,10 +133,7 @@ public abstract class BaseTransformer implements Transformer {
 				fieldValuesMapped.put(attributeName, fieldValue);
 			}
 		}
-		if(event==null) {
-			event = new Event();
-			beanUtilsBean.populate(event, fieldValuesMapped);
-		}
+		event.payload = fieldValuesMapped;
 	}
 
 }

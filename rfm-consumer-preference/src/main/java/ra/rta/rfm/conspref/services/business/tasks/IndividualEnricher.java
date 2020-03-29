@@ -8,6 +8,8 @@ import org.joda.time.Months;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.models.Enrichable;
+import ra.rta.models.Enricher;
 import ra.rta.models.Event;
 import ra.rta.rfm.conspref.models.*;
 
@@ -21,7 +23,7 @@ public class IndividualEnricher implements Enricher {
 	@Override
 	public void enrich(Enrichable enrichable) throws Exception {
 		Customer customer = null;
-		if(enrichable instanceof ra.rta.models.Event) {
+		if(enrichable instanceof Event) {
 			ra.rta.models.Event event = (Event)enrichable;
 			if(event.payload.get("individual")!=null) {
 				customer = (Customer) event.payload.get("individual");

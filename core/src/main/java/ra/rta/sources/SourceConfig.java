@@ -33,10 +33,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SourceConfig {
-    public int groupId = 0;
-    public int command = 0;
+    public long sourceId = 0;
+    public int commandId = 0;
     public String topic;
     public boolean durable = false;
+    public String payloadTransformerClass;
     public int batchSize = 1;
     public Class<? extends Job> jobClass;
     public int timeDivision1;

@@ -99,7 +99,6 @@
 	<modules>
 		<module>core</module>
 		<module>rfm-consumer-preference</module>
-		<module>rfm-patient-drug-effectiveness</module>
     </modules>
 
 </project>
