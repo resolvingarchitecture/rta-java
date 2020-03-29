@@ -1,4 +1,4 @@
-package ra.rta.sources.http;
+package ra.rta.rfm.conspref.sources.http;
 
 import java.io.IOException;
 

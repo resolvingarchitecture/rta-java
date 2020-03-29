@@ -4,26 +4,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import ra.rta.models.Cluster;
-import ra.rta.utilities.DateUtility;
+import ra.rta.models.Event;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.converters.DateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import ra.rta.models.Event;
+import ra.rta.utilities.DateUtility;
 
 public abstract class BaseTransformer implements Transformer {
 
 	static Logger LOG = LoggerFactory.getLogger(BaseTransformer.class);
 
 	protected Map<String, Map<String, Object>> fieldMetaMap;
-	protected Cluster cluster;
-	protected Event eventIn;
-	protected Event eventOut;
+	protected byte[] raw;
 	protected Map<String, Object> fieldNameValues = new HashMap<>();
 	protected Map<String, Object> fieldValuesMapped = new HashMap<>();
+	protected Event event;
+
 	private final BeanUtilsBean beanUtilsBean = new BeanUtilsBean(new ConvertUtilsBean() {
 		@Override
 		@SuppressWarnings("unchecked")
@@ -60,17 +58,16 @@ public abstract class BaseTransformer implements Transformer {
 	}
 
 	@Override
-	public final Event transform(@SuppressWarnings("hiding") Event eventIn) throws Exception {
-		this.eventIn = eventIn;
-//        LOG.info("transform event: "+eventIn);
+	public final Event transform(@SuppressWarnings("hiding") byte[] data) throws Exception {
+		raw = data;
 		select();
 		clean();
         concatenate();
-//		split();
-//		format();
+		split();
+		format();
 		substitute();
 		map();
-		return eventOut;
+		return event;
 	}
 
 	protected abstract void select() throws Exception;
@@ -85,7 +82,6 @@ public abstract class BaseTransformer implements Transformer {
             fieldNameValuesCleaned.put(fieldName, fieldValue);
 		}
 		fieldNameValues = fieldNameValuesCleaned;
-//        LOG.info("Field Values Cleaned: "+fieldNameValues);
 	}
 
     /**
@@ -156,7 +152,7 @@ public abstract class BaseTransformer implements Transformer {
 
 	/**
 	 * Replaces field names with attribute names then populates the supplied
-	 * Entity.
+	 * Event.
 	 */
 	protected void map() throws Exception {
 		for (String fieldName : fieldNameValues.keySet()) {
@@ -168,7 +164,10 @@ public abstract class BaseTransformer implements Transformer {
 				fieldValuesMapped.put(attributeName, fieldValue);
 			}
 		}
-		beanUtilsBean.populate(eventOut, fieldValuesMapped);
+		if(event==null) {
+			event = new Event();
+			beanUtilsBean.populate(event, fieldValuesMapped);
+		}
 	}
 
 }

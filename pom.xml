@@ -97,8 +97,7 @@
 	</dependencies>
 
 	<modules>
-        <module>core</module>
-        <module>rfm</module>
+		<module>core</module>
 		<module>rfm-consumer-preference</module>
 		<module>rfm-patient-drug-effectiveness</module>
     </modules>

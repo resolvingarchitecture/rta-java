@@ -1,4 +1,4 @@
-package ra.rta.sources.timer.jobs;
+package ra.rta.rfm.conspref.sources.timer.jobs;
 
 import java.io.BufferedWriter;
 import java.io.InputStream;
@@ -23,12 +23,12 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.models.ChaseFailure;
-import ra.rta.models.Cluster;
-import ra.rta.models.ExactMatchFailure;
-import ra.rta.utilities.DateUtility;
-import ra.rta.publish.cassandra.DataServiceManager;
-import ra.rta.publish.cassandra.GroupDataService;
+import ra.rta.rfm.conspref.models.ChaseFailure;
+import ra.rta.rfm.conspref.models.Cluster;
+import ra.rta.rfm.conspref.models.ExactMatchFailure;
+import ra.rta.rfm.conspref.utilities.DateUtility;
+import ra.rta.persistence.PersistenceManager;
+import ra.rta.persistence.cassandra.GroupDataService;
 import ra.rta.classify.WANDDataService;
 
 public class WANDPostJob implements Job {
@@ -52,8 +52,8 @@ public class WANDPostJob implements Job {
 		System.out.println(msg);
 		String wandPostPathString = (String)map.get("wandPostPath");
 		String tempPostPathString = "/tmp";
-		GroupDataService groupDataService = DataServiceManager.getGroupDataService();
-		WANDDataService wandDataService = DataServiceManager.getWandDataService();
+		GroupDataService groupDataService = PersistenceManager.getGroupDataService();
+		WANDDataService wandDataService = PersistenceManager.getWandDataService();
 		// Get list of active Partners
 		Map<String, Cluster> partners = groupDataService.getAllActivePartnersMap();
 		Set<String> partnerNames = partners.keySet();
@@ -129,7 +129,7 @@ public class WANDPostJob implements Job {
 	public static void main(String[] args) throws Exception {
 		Map<String,String> properties = new HashMap<>();
 		properties.put("topology.cassandra.seednode","165.13.51.145");
-		DataServiceManager.setProperties(properties);
+		PersistenceManager.setProperties(properties);
 		String wandPostPath = "/tmp/end/";
 
 		JobDataMap wandPostJobDataMap = new JobDataMap();

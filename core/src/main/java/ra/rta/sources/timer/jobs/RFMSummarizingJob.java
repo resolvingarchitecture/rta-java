@@ -1,14 +1,14 @@
-package ra.rta.sources.timer.jobs;
+package ra.rta.rfm.conspref.sources.timer.jobs;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.Event;
-import ra.rta.sources.SourceConfig;
-import ra.rta.sources.timer.TimerSource;
-import ra.rta.utilities.JSONUtil;
-import ra.rta.utilities.RandomUtil;
+import ra.rta.rfm.conspref.models.Event;
+import ra.rta.rfm.conspref.sources.SourceConfig;
+import ra.rta.rfm.conspref.sources.timer.TimerSource;
+import ra.rta.rfm.conspref.utilities.JSONUtil;
+import ra.rta.rfm.conspref.utilities.RandomUtil;
 
 /**
  * Sends an event to kick off RFM Summarizing

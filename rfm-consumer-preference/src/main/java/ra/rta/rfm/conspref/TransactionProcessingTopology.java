@@ -4,9 +4,11 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.storm.kafka.spout.KafkaSpout;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
-import ra.rta.bolts.*;
+import ra.rta.rfm.conspref.bolts.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.rfm.conspref.classify.ClassificationBolt;
+import ra.rta.rfm.conspref.publish.PublishBolt;
 
 /**
  * Process transactions.

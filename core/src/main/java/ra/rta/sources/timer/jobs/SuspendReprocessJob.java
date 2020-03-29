@@ -1,19 +1,19 @@
-package ra.rta.sources.timer.jobs;
+package ra.rta.rfm.conspref.sources.timer.jobs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ra.rta.models.Envelope;
-import ra.rta.models.FinancialTransaction;
-import ra.rta.models.Cluster;
-import ra.rta.models.Record;
+import ra.rta.rfm.conspref.models.Envelope;
+import ra.rta.rfm.conspref.models.FinancialTransaction;
+import ra.rta.rfm.conspref.models.Cluster;
+import ra.rta.rfm.conspref.models.Record;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.sources.MessageManager;
-import ra.rta.publish.cassandra.DataServiceManager;
-import ra.rta.publish.cassandra.TransactionDataService;
+import ra.rta.rfm.conspref.sources.MessageManager;
+import ra.rta.persistence.PersistenceManager;
+import ra.rta.persistence.cassandra.TransactionDataService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -44,9 +44,9 @@ public class SuspendReprocessJob implements Job {
         LOG.info(msg);
         MessageManager messageManager = (MessageManager) map.get(KAFKA_PRODUCER);
         String topic = (String) map.get(KAFKA_TOPIC);
-        DataServiceManager dataServiceManager = (DataServiceManager)map.get(DataServiceManager.class.getSimpleName());
-        Map<String, Cluster> activePartners = dataServiceManager.getGroupDataService().getAllActivePartnersMap();
-        TransactionDataService transactionDataService = dataServiceManager.getTransactionDataService();
+        PersistenceManager persistenceManager = (PersistenceManager)map.get(PersistenceManager.class.getSimpleName());
+        Map<String, Cluster> activePartners = persistenceManager.getGroupDataService().getAllActivePartnersMap();
+        TransactionDataService transactionDataService = persistenceManager.getTransactionDataService();
         for(String partnerName : activePartners.keySet()) {
             List<FinancialTransaction> suspendedFinancialTransactions = transactionDataService.getSuspended(partnerName);
             for (FinancialTransaction financialTransaction : suspendedFinancialTransactions) {

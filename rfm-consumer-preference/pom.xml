@@ -47,6 +47,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>resolvingarchitecture</groupId>
+			<artifactId>rta-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>${joda-time.version}</version>

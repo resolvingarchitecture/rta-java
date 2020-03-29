@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.sources.MessageManager;
+import ra.rta.MessageManager;
 
 public class FileSource implements Runnable {
 

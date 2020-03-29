@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.MessageManager;
 import ra.rta.models.Event;
-import ra.rta.sources.MessageManager;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
 

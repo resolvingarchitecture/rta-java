@@ -6,11 +6,11 @@ import org.apache.storm.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.bolts.AnalyticsBolt;
-import ra.rta.bolts.ClassificationBolt;
-import ra.rta.bolts.ContentEnricherBolt;
-import ra.rta.bolts.PublishBolt;
-import ra.rta.bolts.TransformBolt;
+import ra.rta.rfm.conspref.bolts.AnalyticsBolt;
+import ra.rta.rfm.conspref.classify.ClassificationBolt;
+import ra.rta.rfm.conspref.bolts.ContentEnricherBolt;
+import ra.rta.rfm.conspref.publish.PublishBolt;
+import ra.rta.rfm.conspref.bolts.TransformBolt;
 
 /**
  *

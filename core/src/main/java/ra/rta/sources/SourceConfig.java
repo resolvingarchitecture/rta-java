@@ -27,6 +27,7 @@
 package ra.rta.sources;
 
 import org.quartz.Job;
+import ra.rta.MessageManager;
 
 import java.util.HashMap;
 import java.util.Map;

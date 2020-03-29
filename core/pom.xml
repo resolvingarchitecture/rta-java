@@ -9,7 +9,7 @@
 		<version>0.5.2-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>core</artifactId>
+	<artifactId>rta-core</artifactId>
 
 	<packaging>jar</packaging>
 
@@ -200,13 +200,6 @@
 			<groupId>org.apache.storm</groupId>
 			<artifactId>storm-server</artifactId>
 			<version>${storm.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.esotericsoftware.kryo</groupId>
-			<artifactId>kryo</artifactId>
-			<!-- keep this version insync with what Storm uses through cabonite/chill -->
-			<version>2.21</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

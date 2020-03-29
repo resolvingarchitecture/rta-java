@@ -8,19 +8,16 @@ public class CSVTransformer extends BaseTransformer {
 
     @Override
     protected void select() throws Exception {
+        String body = new String(raw);
         List<String> rawValues = null;
         for(String fieldName : fieldMetaMap.keySet()) {
             Map<String,Object> fieldMetaPropertyMap = fieldMetaMap.get(fieldName);
             int startPosition = (int) fieldMetaPropertyMap.get("select_start_position");
             if(rawValues == null) {
                 String delimiter = (String) fieldMetaPropertyMap.get("type");
-                rawValues = Arrays.asList(raw.split(delimiter));
+                rawValues = Arrays.asList(body.split(delimiter));
             }
-            try {
-                fieldNameValues.put(fieldName, rawValues.get(startPosition));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            fieldNameValues.put(fieldName, rawValues.get(startPosition));
         }
     }
 }

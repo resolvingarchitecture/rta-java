@@ -11,10 +11,7 @@ import org.apache.storm.tuple.Tuple;
 import org.apache.storm.tuple.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import ra.rta.models.Event;
-import ra.rta.sources.MessageManager;
-import ra.rta.publish.cassandra.DataServiceManager;
 
 public abstract class BaseEventEmitterBolt extends BaseRichBolt {
 
@@ -25,7 +22,6 @@ public abstract class BaseEventEmitterBolt extends BaseRichBolt {
 	protected Map map;
 	protected TopologyContext topologyContext;
 	protected OutputCollector outputCollector;
-	protected MessageManager messageManager;
 
 	public abstract void execute(Event event) throws Exception;
 
@@ -35,8 +31,6 @@ public abstract class BaseEventEmitterBolt extends BaseRichBolt {
 		this.map = map;
 		this.topologyContext = topologyContext;
 		this.outputCollector = outputCollector;
-		DataServiceManager.setProperties(map);
-		messageManager = new MessageManager(map);
 	}
 
 	@Override
@@ -60,7 +54,6 @@ public abstract class BaseEventEmitterBolt extends BaseRichBolt {
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		DataServiceManager.close();
 	}
 
 }

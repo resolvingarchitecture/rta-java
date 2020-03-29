@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ra.rta.models.Event;
-import ra.rta.sources.MessageManager;
-import ra.rta.publish.cassandra.DataServiceManager;
 
 public abstract class BaseEventEndBolt extends BaseRichBolt {
 
@@ -23,8 +21,6 @@ public abstract class BaseEventEndBolt extends BaseRichBolt {
 
 	private OutputCollector outputCollector;
 
-	protected MessageManager messageManager;
-
 	protected static final ObjectMapper MAPPER = new ObjectMapper();
 
 	public abstract void execute(Event event) throws Exception;
@@ -33,8 +29,6 @@ public abstract class BaseEventEndBolt extends BaseRichBolt {
 	@SuppressWarnings("hiding")
 	public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
-		DataServiceManager.setProperties(map);
-		messageManager = new MessageManager(map);
 	}
 
 	@Override
@@ -57,6 +51,5 @@ public abstract class BaseEventEndBolt extends BaseRichBolt {
 	@Override
 	public void cleanup() {
 		super.cleanup();
-		DataServiceManager.close();
 	}
 }

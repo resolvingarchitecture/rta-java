@@ -6,7 +6,7 @@
   	<!-- Standard Action Servlet Configuration (with debugging) -->
   	<servlet>
     	<servlet-name>producer</servlet-name>
-    	<servlet-class>ra.rta.sources.http.HTTPSource</servlet-class>
+    	<servlet-class>ra.rta.rfm.conspref.sources.http.HTTPSource</servlet-class>
     	<init-param>
       		<param-name>metadata.broker.list</param-name>
       		<param-value>localhost:9092</param-value>

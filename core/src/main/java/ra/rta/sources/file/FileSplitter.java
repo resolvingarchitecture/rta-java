@@ -1,9 +1,9 @@
 package ra.rta.sources.file;
 
-import ra.rta.models.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.sources.MessageManager;
+import ra.rta.MessageManager;
+import ra.rta.models.Event;
 import ra.rta.utilities.JSONUtil;
 
 import java.io.LineNumberReader;

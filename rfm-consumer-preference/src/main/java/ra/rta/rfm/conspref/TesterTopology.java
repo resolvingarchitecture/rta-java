@@ -3,7 +3,7 @@ package ra.rta.rfm.conspref;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.storm.kafka.spout.KafkaSpout;
 import org.apache.storm.topology.TopologyBuilder;
-import ra.rta.bolts.TesterBolt;
+import ra.rta.rfm.conspref.test.TesterBolt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

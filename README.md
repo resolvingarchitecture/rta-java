@@ -24,11 +24,21 @@ Will not run yet as it is being refactored into a form for more general use.
 
 ## Design
 
+### Databases
+
+#### Event Database: Cassandra
+Events are persisted to Cassandra and used to feed population summarization and other analytics.
+
+#### Reference Database: File
+
+#### Relationships Database: Neo4J
+
+#### Cache Database: In-Memory HashMap<id,Individual>
 
 
 ## [Implementation](https://github.com/resolvingarchitecture/rta)
 
-The application is written in Java using JDK 1.10 although some components do support older versions (1.7).
+The application is compiled using JDK 1.11 although some components do support older versions (1.7).
 
 ## Integrations
 

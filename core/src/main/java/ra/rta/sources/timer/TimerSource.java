@@ -4,8 +4,8 @@ import org.quartz.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.MessageManager;
 import ra.rta.sources.SourceConfig;
-import ra.rta.sources.MessageManager;
 import ra.rta.utilities.RandomUtil;
 
 /**

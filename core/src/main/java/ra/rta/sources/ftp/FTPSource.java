@@ -23,8 +23,8 @@ import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ra.rta.MessageManager;
 import ra.rta.models.Event;
-import ra.rta.sources.MessageManager;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
 

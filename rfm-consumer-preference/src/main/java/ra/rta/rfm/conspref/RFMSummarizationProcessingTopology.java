@@ -7,10 +7,10 @@ import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.bolts.rfm.IndividualKPISplitterBolt;
-import ra.rta.bolts.rfm.GroupSplitterBolt;
-import ra.rta.bolts.rfm.SummarizeIndividualRFMBolt;
-import ra.rta.bolts.rfm.SummarizeGroupRFMBolt;
+import ra.rta.rfm.conspref.analyze.IndividualKPISplitterBolt;
+import ra.rta.rfm.conspref.analyze.GroupSplitterBolt;
+import ra.rta.rfm.conspref.analyze.SummarizeIndividualRFMBolt;
+import ra.rta.rfm.conspref.analyze.SummarizeGroupRFMBolt;
 
 /**
  * Summarizes Partner and Customer KPI RFM values
