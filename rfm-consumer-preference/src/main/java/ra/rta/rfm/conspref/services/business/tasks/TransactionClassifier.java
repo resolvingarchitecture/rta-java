@@ -5,8 +5,8 @@ import java.util.LinkedHashSet;
 import java.util.concurrent.ExecutionException;
 
 import com.google.common.cache.LoadingCache;
-import ra.rta.models.EventException;
-import ra.rta.models.KPI;
+import ra.rta.EventException;
+import ra.rta.classify.KPI;
 import ra.rta.rfm.conspref.utilities.DateUtility;
 import ra.rta.rfm.conspref.services.business.ClassificationService;
 import ra.rta.rfm.conspref.services.business.events.TransactionEvent;
@@ -21,22 +21,22 @@ public class TransactionClassifier implements Classifier {
 	private static Logger LOG = LoggerFactory.getLogger(TransactionClassifier.class);
 
 	@Override
-	public void classify(Classifiable classifiable, LoadingCache<String, LinkedHashSet<ra.rta.models.KPI>> exactMatchTermcodeCache) throws Exception {
+	public void classify(Classifiable classifiable, LoadingCache<String, LinkedHashSet<KPI>> exactMatchTermcodeCache) throws Exception {
 		if(classifiable instanceof TransactionEvent) {
 			TransactionEvent eventIn = (TransactionEvent)classifiable;
 			if (eventIn.financialTransaction.payee == null || "".equals(eventIn.financialTransaction.payee)) {
 				eventIn.financialTransaction.status = FinancialTransaction.Status.Rejected;
 				// String errorMsg = transaction.getId().toString();
 				String errorMsg = "null or empty payee";
-				ra.rta.models.EventException exception = new ra.rta.models.EventException(ClassificationService.class.getSimpleName(), 105, errorMsg, eventIn);
+				EventException exception = new EventException(ClassificationService.class.getSimpleName(), 105, errorMsg, eventIn);
 				DataServiceManager.getErrorsDataService().save(exception, eventIn);
 				return;
 			}
 			String nowDateStr = DateUtility.timestampToSimpleDateString(new Date());
 			WANDDataService wandDataService = DataServiceManager.getWandDataService();
 			try {
-				LinkedHashSet<ra.rta.models.KPI> cachedTermcodes = exactMatchTermcodeCache.get(eventIn.financialTransaction.payee);
-				for (ra.rta.models.KPI kpi : cachedTermcodes) {
+				LinkedHashSet<KPI> cachedTermcodes = exactMatchTermcodeCache.get(eventIn.financialTransaction.payee);
+				for (KPI kpi : cachedTermcodes) {
 					eventIn.financialTransaction.kpis.add((KPI) kpi.clone());
 				}
 			} catch (ExecutionException e) {
@@ -58,7 +58,7 @@ public class TransactionClassifier implements Classifier {
 				wandDataService.save(partnerName, exactMatchFailure);
 				DataServiceManager.getTransactionDataService().suspend(transaction);
 				String errorMsg = transaction.getPayee();
-				ra.rta.models.EventException exception = new EventException(ClassificationService.class.getSimpleName(), 106,
+				EventException exception = new EventException(ClassificationService.class.getSimpleName(), 106,
 						errorMsg, event);
 				DataServiceManager.getErrorsDataService().save(exception, event);
 					e.printStackTrace();

@@ -4,7 +4,7 @@ import org.quartz.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
+import ra.rta.connectors.kafka.KafkaMgr;
 import ra.rta.sources.SourceConfig;
 import ra.rta.utilities.RandomUtil;
 
@@ -36,7 +36,7 @@ public class TimerSource implements Runnable {
 		c.timeDivision1 = Integer.parseInt(args[i++]);
 		c.timeDivision2 = Integer.parseInt(args[i++]);
 		c.props.put("topology.cassandra.seednode",args[i++]);
-		c.messageManager = new MessageManager(c.props);
+		c.kafkaMgr = new KafkaMgr(c.props);
 
 		TimerSource timerSource = new TimerSource(c);
 		timerSource.run();

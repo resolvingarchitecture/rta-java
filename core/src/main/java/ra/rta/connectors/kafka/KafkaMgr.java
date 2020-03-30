@@ -1,4 +1,4 @@
-package ra.rta;
+package ra.rta.connectors.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -13,12 +13,21 @@ import java.util.Properties;
 /**
  *
  */
-public final class MessageManager {
+public final class KafkaMgr {
 
     private Producer<String,byte[]> relaxedProducer;
     private Producer<String,byte[]> durableProducer;
 
-    public MessageManager(Map<String,Object> map) {
+    private static KafkaMgr instance;
+
+    private KafkaMgr(){}
+
+    public static KafkaMgr getInstance() {
+        return instance;
+    }
+
+    public static KafkaMgr init(Map<String,Object> map) {
+        instance = new KafkaMgr();
         Properties rProps = new Properties();
         rProps.put(ProducerConfig.CLIENT_ID_CONFIG, "RelaxedProducer");
         rProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, map.get("topology.kafka.broker.list"));
@@ -26,7 +35,7 @@ public final class MessageManager {
         rProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         rProps.put(ProducerConfig.ACKS_CONFIG, "1");
 //        rProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, "ra.rta.producers.utilities.partitioners.KafkaRoundRobinPartitioner");
-        relaxedProducer = new KafkaProducer<>(rProps);
+        instance.relaxedProducer = new KafkaProducer<>(rProps);
 
         Properties dProps = new Properties();
         dProps.put(ProducerConfig.CLIENT_ID_CONFIG, "DurableProducer");
@@ -35,7 +44,8 @@ public final class MessageManager {
         dProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         dProps.put(ProducerConfig.ACKS_CONFIG, "-1");
 //        dProps.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, "ra.rta.producers.utilities.partitioners.KafkaRoundRobinPartitioner");
-        durableProducer = new KafkaProducer<>(dProps);
+        instance.durableProducer = new KafkaProducer<>(dProps);
+        return instance;
     }
 
     public void send(String topic, byte[] message, boolean durable) {

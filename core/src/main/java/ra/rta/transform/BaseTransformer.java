@@ -3,7 +3,7 @@ package ra.rta.transform;
 import java.util.HashMap;
 import java.util.Map;
 
-import ra.rta.models.Event;
+import ra.rta.Event;
 import org.apache.commons.beanutils.converters.DateConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

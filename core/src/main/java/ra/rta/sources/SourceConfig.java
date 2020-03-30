@@ -27,7 +27,7 @@
 package ra.rta.sources;
 
 import org.quartz.Job;
-import ra.rta.MessageManager;
+import ra.rta.connectors.kafka.KafkaMgr;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,5 +46,5 @@ public class SourceConfig {
     public Integer[] timeDivision4;
     public String periodicity;
     public Map<String,Object> props = new HashMap<>();
-    public MessageManager messageManager;
+    public KafkaMgr kafkaMgr;
 }

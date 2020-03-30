@@ -2,7 +2,7 @@ package ra.rta.rfm.conspref.services.business;
 
 import java.util.Map;
 
-import ra.rta.models.Event;
+import ra.rta.Event;
 import ra.rta.rfm.conspref.models.Group;
 import ra.rta.rfm.conspref.models.Transformer;
 import ra.rta.rfm.conspref.services.business.tasks.TransformerFactory;

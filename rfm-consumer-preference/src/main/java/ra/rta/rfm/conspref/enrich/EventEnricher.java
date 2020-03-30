@@ -26,11 +26,11 @@
  */
 package ra.rta.rfm.conspref.enrich;
 
-import ra.rta.models.Enrichable;
+import ra.rta.enrich.Enrichable;
 import ra.rta.models.Enricher;
-import ra.rta.models.Event;
+import ra.rta.Event;
 import ra.rta.rfm.conspref.models.Identity;
-import ra.rta.persistence.PersistenceManager;
+import ra.rta.connectors.PersistenceManager;
 
 import java.util.Calendar;
 

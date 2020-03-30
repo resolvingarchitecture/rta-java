@@ -21,7 +21,7 @@ import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
-import ra.rta.rfm.conspref.models.KPIIndividualSummary;
+import ra.rta.rfm.conspref.models.KPICustomerSummary;
 import ra.rta.rfm.conspref.utilities.DateUtility;
 import ra.rta.rfm.conspref.services.data.DataServiceManager;
 
@@ -70,14 +70,14 @@ public class SummarizeIndividualRFMBolt extends BaseRichBolt {
 		UUID adid = (UUID)tuple.getValueByField("adid");
 		Integer termcode = tuple.getIntegerByField("termcode");
 		//        LOG.info("Partner.name: "+partnerName+"; adid: "+adid+"; termcode: "+termcode);
-		KPIIndividualSummary KPIIndividualSummary = new KPIIndividualSummary();
-		KPIIndividualSummary.setAdId(adid);
-		KPIIndividualSummary.setTermcode(termcode);
+		KPICustomerSummary KPICustomerSummary = new KPICustomerSummary();
+		KPICustomerSummary.setAdId(adid);
+		KPICustomerSummary.setTermcode(termcode);
 		// Update customer_KPI_rfm_windowed
 		try {
 			// 1
 			int endDate = DateUtility.dateToInt(Calendar.getInstance().getTime());
-			KPIIndividualSummary.setDate(endDate);
+			KPICustomerSummary.setDate(endDate);
 			int windowDays = windowLookup.get(termcode);
 			//            LOG.info("windowDays="+windowDays);
 			Calendar beginCalendar = Calendar.getInstance();
@@ -98,20 +98,20 @@ public class SummarizeIndividualRFMBolt extends BaseRichBolt {
 				} first = false;
 			}
 
-			KPIIndividualSummary.setFrequency(frequency);
-			KPIIndividualSummary.setRecency(recency);
+			KPICustomerSummary.setFrequency(frequency);
+			KPICustomerSummary.setRecency(recency);
 
 			// Sum monetary over window
 			rs = session.execute("SELECT monetary FROM "+partnerName+".customer_KPI_monetary where adid="+adid+" and date > "+beginDate+" and  termcode="+termcode+";");
 			for (Row row : rs) {
 				monetary += row.getLong(0);
 			}
-			KPIIndividualSummary.setMonetary((double)monetary/100);
+			KPICustomerSummary.setMonetary((double)monetary/100);
 
 			// Insert new summary
 			session.execute("INSERT INTO "+partnerName+".customer_KPI_rfm_windowed (adid, termcode, date, window_days, recency, frequency, monetary) VALUES ("+adid+","+termcode+","+endDate+","+windowDays+","+recency+","+frequency+","+monetary+");");
 
-			outputCollector.emit(new Values(partnerName, termcode, KPIIndividualSummary));
+			outputCollector.emit(new Values(partnerName, termcode, KPICustomerSummary));
 
 		} catch (Exception e) {
 			LOG.error(SummarizeIndividualRFMBolt.class.getSimpleName() + " error: " + e);

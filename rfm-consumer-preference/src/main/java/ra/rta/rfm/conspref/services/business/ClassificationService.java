@@ -5,14 +5,14 @@ import java.util.*;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import ra.rta.models.KPI;
+import ra.rta.classify.KPI;
 import ra.rta.rfm.conspref.services.data.DataServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ra.rta.rfm.conspref.models.Classifiable;
 import ra.rta.rfm.conspref.models.Classifier;
-import ra.rta.models.Event;
+import ra.rta.Event;
 
 public class ClassificationService {
 

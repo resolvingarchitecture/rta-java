@@ -2,7 +2,7 @@ package ra.rta.transform;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.Event;
+import ra.rta.Event;
 
 import java.util.Map;
 

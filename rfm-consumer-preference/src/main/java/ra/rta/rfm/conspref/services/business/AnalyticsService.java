@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import ra.rta.rfm.conspref.analyze.rules.CustomerFactAssembler;
 import ra.rta.rfm.conspref.analyze.rules.StatelessKieSessionFactory;
 import ra.rta.rfm.conspref.models.Entity;
-import ra.rta.models.Event;
+import ra.rta.Event;
 
 /**
  * Use embedded Drools Rules Engine to determine KPIs.

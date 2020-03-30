@@ -2,7 +2,7 @@ package ra.rta.rfm.conspref.models;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
-public class KPIIndividualSummary {
+public class KPICustomerSummary {
 
 	static final long serialVersionUID = 1L;
 

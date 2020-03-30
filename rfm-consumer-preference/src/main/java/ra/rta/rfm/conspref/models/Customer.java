@@ -4,9 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import ra.rta.models.KPI;
+import ra.rta.classify.KPIClassifiable;
+import ra.rta.classify.KPI;
+import ra.rta.enrich.Enrichable;
 
-public final class Customer {
+public final class Customer implements KPIClassifiable, Enrichable {
 
 	static final long serialVersionUID = 1L;
 
@@ -19,8 +21,8 @@ public final class Customer {
 	}
 
 	public Group group;
-	public Set<ra.rta.models.KPI> kpis = new HashSet<>();
-	public List<IndividualInteraction> individualInteractions = new ArrayList<>();
+	public Set<KPI> kpis = new HashSet<>();
+	public List<CustomerInteraction> customerInteractions = new ArrayList<>();
 
 	public long id;
 	public long gId;
@@ -54,51 +56,63 @@ public final class Customer {
 
 	public boolean save = false;
 
-	public void addKPI(ra.rta.models.KPI KPI) {
+	@Override
+	public List<KPI> classify(Map<String, LinkedHashSet<? extends KPI>> exactMatchTermcodeCache) throws Exception {
+		List<KPI> currentKPIs = new ArrayList<>();
+
+		return currentKPIs;
+	}
+
+	@Override
+	public void enrich(Map<String, Object> input) throws Exception {
+
+	}
+
+	public void addKPI(KPI KPI) {
 		kpis.add(KPI);
 	}
 
 	public void addKPI(int termcode) {
-		ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+		KPI kpi = new KPI(termcode);
 		kpi.date = new Date();
 		kpis.add(kpi);
 	}
 
 	public void addKPI(int termcode, String date) throws Exception {
-		ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+		KPI kpi = new KPI(termcode);
 		kpi.date = new SimpleDateFormat("yyyy-MM-dd").parse(date);
 		kpis.add(kpi);
 	}
 
     public void addKPI(int termcode, Date date) throws Exception {
-        ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+        KPI kpi = new KPI(termcode);
 		kpi.date = date;
         kpis.add(kpi);
     }
 
 	public void addKPI(int termcode, int windowDays) {
-		ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+		KPI kpi = new KPI(termcode);
 		kpi.date = new Date();
 		kpi.windowDays = windowDays;
 		kpis.add(kpi);
 	}
 
 	public void addKPI(int termcode, String date, int windowDays) throws Exception {
-		ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+		KPI kpi = new KPI(termcode);
 		kpi.date = new SimpleDateFormat("yyyy-MM-dd").parse(date);
 		kpi.windowDays = windowDays;
 		kpis.add(kpi);
 	}
 
     public void addKPI(int termcode, Date date, int windowDays) throws Exception {
-        ra.rta.models.KPI kpi = new ra.rta.models.KPI(termcode);
+        KPI kpi = new KPI(termcode);
 		kpi.date = date;
 		kpi.windowDays = windowDays;
         kpis.add(kpi);
     }
 
 	public void removeKPI(int termcode) {
-		ra.rta.models.KPI KPI = new ra.rta.models.KPI(termcode);
+		KPI KPI = new KPI(termcode);
 		kpis.remove(KPI);
 	}
 

@@ -5,19 +5,13 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
 
-@Table
 public final class Group {
 
 	private static final long serialVersionUID = 1L;
 
-	@PrimaryKey
 	public String name;
 	public String core;
-	@Column("command_maps")
 	public Map<String,String> commandMaps = new HashMap<>();
 	public Map<String,String> formatters = new HashMap<>();
 	public Boolean unified;

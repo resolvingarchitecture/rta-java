@@ -1,4 +1,4 @@
-package ra.rta.models;
+package ra.rta;
 
 import java.io.Serializable;
 import java.util.Map;

@@ -24,14 +24,7 @@
 
   For more information, please refer to <http://unlicense.org/>
  */
-package ra.rta.rfm.conspref.publish.cassandra;
+package ra.rta.connectors.neo4j;
 
-import ra.rta.models.Event;
-import ra.rta.rfm.conspref.publish.sinks.Sink;
-
-public class CassandraSink implements Sink {
-    @Override
-    public void publish(Event event) {
-
-    }
+public class Neo4JMgr {
 }

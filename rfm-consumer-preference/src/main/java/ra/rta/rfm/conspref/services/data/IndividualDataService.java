@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.datastax.driver.core.*;
 import ra.rta.rfm.conspref.models.Customer;
-import ra.rta.models.KPI;
+import ra.rta.classify.KPI;
 import ra.rta.rfm.conspref.utilities.DateUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

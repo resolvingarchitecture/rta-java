@@ -14,8 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
-import ra.rta.models.Event;
+import ra.rta.connectors.kafka.KafkaMgr;
+import ra.rta.Event;
 import ra.rta.transform.JSONTransformer;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
@@ -30,7 +30,7 @@ class HTTPSource extends HttpServlet {
   private long sourceId;
   private String topic;
   private boolean durable = false;
-  private MessageManager messageManager;
+  private KafkaMgr kafkaMgr;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
@@ -41,7 +41,7 @@ class HTTPSource extends HttpServlet {
       String param = (String)initParams.nextElement();
       params.put(param, config.getInitParameter(param));
     }
-    messageManager = new MessageManager(params);
+    kafkaMgr = new KafkaMgr(params);
     topic = (String)params.get("topic");
     durable = (Boolean)params.get("durable");
     sourceId = (Long)params.get("sourceId");
@@ -72,7 +72,7 @@ class HTTPSource extends HttpServlet {
       event.rawPayload = sb.toString().getBytes();
       try {
         LOG.info(".");
-        messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
+        kafkaMgr.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
         resp.setStatus(200);
         resp.setContentType("application/json");
         resp.getOutputStream().print("{status: Success}");

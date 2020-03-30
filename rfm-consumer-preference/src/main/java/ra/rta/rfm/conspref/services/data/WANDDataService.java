@@ -5,7 +5,7 @@ import java.util.*;
 import com.datastax.driver.core.*;
 import ra.rta.rfm.conspref.models.ChaseFailure;
 import ra.rta.rfm.conspref.models.ExactMatchFailure;
-import ra.rta.models.KPI;
+import ra.rta.classify.KPI;
 
 public class WANDDataService extends BaseDataService {
 

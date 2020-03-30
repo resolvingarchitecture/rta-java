@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
 import java.util.Date;
 
-public class IndividualInteraction {
+public class CustomerInteraction {
 
 	@SuppressWarnings("hiding")
 	static final long serialVersionUID = 1L;

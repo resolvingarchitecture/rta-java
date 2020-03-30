@@ -4,10 +4,9 @@ import java.util.Calendar;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.Enrichable;
+import ra.rta.enrich.Enrichable;
 import ra.rta.models.Enricher;
-import ra.rta.models.Event;
-import ra.rta.rfm.conspref.models.*;
+import ra.rta.Event;
 
 /**
  *
@@ -19,8 +18,8 @@ public class IndividualEnricher implements Enricher {
 	@Override
 	public void enrich(Enrichable enrichable) throws Exception {
 		Identity identity = null;
-		if(enrichable instanceof ra.rta.models.Event) {
-			ra.rta.models.Event event = (Event)enrichable;
+		if(enrichable instanceof Event) {
+			Event event = (Event)enrichable;
 			if(event.indId > 0) {
 				identity = (Identity) event.payload.get("individual");
 			}

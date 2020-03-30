@@ -11,19 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ra.rta.models.Event;
+import ra.rta.utilities.JSONUtil;
 
-public abstract class BaseEventEndBolt extends BaseRichBolt {
+public class EventEndBolt extends BaseRichBolt {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOG = LoggerFactory.getLogger(BaseEventEndBolt.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EventEndBolt.class);
 
 	private OutputCollector outputCollector;
 
 	protected static final ObjectMapper MAPPER = new ObjectMapper();
-
-	public abstract void execute(Event event) throws Exception;
 
 	@Override
 	@SuppressWarnings("hiding")
@@ -35,9 +33,10 @@ public abstract class BaseEventEndBolt extends BaseRichBolt {
 	public void execute(Tuple tuple) {
 		try {
 			Event event = (Event) tuple.getValueByField(Event.class.getSimpleName());
-			execute(event);
+			// TODO: Move to a permanent log system specifically for recording events in a log
+			LOG.debug("Event completed processing:\n\t"+JSONUtil.MAPPER.writeValueAsString(event));
 		} catch (Exception e) {
-			LOG.error("Exception caught in " + BaseEventEndBolt.class.getSimpleName() + ".execute()", e);
+			LOG.error("Exception caught in " + EventEndBolt.class.getSimpleName() + ".execute()", e);
 			outputCollector.reportError(e);
 		}
 		outputCollector.ack(tuple);

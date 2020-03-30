@@ -1,4 +1,4 @@
-package ra.rta.models;
+package ra.rta;
 
 public enum Relationship {
     Unknown, Known

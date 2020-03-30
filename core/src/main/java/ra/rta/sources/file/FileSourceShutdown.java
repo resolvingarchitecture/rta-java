@@ -2,7 +2,7 @@ package ra.rta.sources.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
+import ra.rta.connectors.kafka.KafkaMgr;
 
 import java.util.List;
 
@@ -11,14 +11,14 @@ public class FileSourceShutdown extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(FileSourceShutdown.class);
 
     private List<FileSplitter> fileSplitters;
-    private MessageManager messageManager;
+    private KafkaMgr kafkaMgr;
     private int maxWait = 20000;
     private int waitTime = 2000;
     private int accumulatedWait = 0;
 
-    public FileSourceShutdown(List<FileSplitter> fileSplitters, MessageManager messageManager) {
+    public FileSourceShutdown(List<FileSplitter> fileSplitters, KafkaMgr kafkaMgr) {
         this.fileSplitters = fileSplitters;
-        this.messageManager = messageManager;
+        this.kafkaMgr = kafkaMgr;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class FileSourceShutdown extends Thread {
                 }
             }
         } while(fileSplitters.size() < fileSplittersCompleted);
-        messageManager.shutdown();
+        kafkaMgr.shutdown();
         if(accumulatedWait < maxWait)
             LOG.info("All worker threads stopped. {} gracefully shutdown.", FileSource.class.getSimpleName());
         else

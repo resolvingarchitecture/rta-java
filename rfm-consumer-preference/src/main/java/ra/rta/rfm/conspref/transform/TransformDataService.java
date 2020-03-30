@@ -4,7 +4,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.SimpleStatement;
-import ra.rta.persistence.cassandra.BaseDataService;
+import ra.rta.connectors.cassandra.BaseDataService;
 
 import java.util.*;
 

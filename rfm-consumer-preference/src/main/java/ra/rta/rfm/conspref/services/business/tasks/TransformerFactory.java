@@ -2,7 +2,7 @@ package ra.rta.rfm.conspref.services.business.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.Event;
+import ra.rta.Event;
 import ra.rta.rfm.conspref.models.Group;
 import ra.rta.rfm.conspref.models.Transformer;
 

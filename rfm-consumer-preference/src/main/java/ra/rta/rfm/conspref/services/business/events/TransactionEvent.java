@@ -3,7 +3,7 @@ package ra.rta.rfm.conspref.services.business.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import ra.rta.models.Event;
+import ra.rta.Event;
 import ra.rta.rfm.conspref.models.*;
 import ra.rta.rfm.conspref.services.business.tasks.TransactionClassifier;
 

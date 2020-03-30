@@ -4,9 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.ftpserver.FtpServer;
@@ -23,8 +21,8 @@ import org.apache.ftpserver.listener.ListenerFactory;
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
-import ra.rta.models.Event;
+import ra.rta.connectors.kafka.KafkaMgr;
+import ra.rta.Event;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
 
@@ -36,7 +34,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(FTPSource.class);
 
 	private FtpletContext ftpletContext;
-	private MessageManager messageManager;
+	private KafkaMgr kafkaMgr;
 	private long sourceId = 0;
 	private int commandId = 0;
 	private String topic;
@@ -60,7 +58,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 		this.durable = durable;
 		Map<String,Object> args = new HashMap<>();
 		args.put("topology.kafka.broker.list", messageBrokerList);
-		messageManager = new MessageManager(args);
+		kafkaMgr = new KafkaMgr(args);
 	}
 
 	public void init(String... args) {
@@ -72,7 +70,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 		commandId = Integer.parseInt(args[i++]);
 		topic = args[i++];
 		durable = "durable".equals(args[i++]);
-		messageManager = new MessageManager(params);
+		kafkaMgr = new KafkaMgr(params);
 	}
 
 	@Override
@@ -134,7 +132,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 				event.commandId = commandId;
 				event.rawPayload = line.getBytes();
 				event.payloadTransformerClass = payloadTransformerClass;
-				messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
+				kafkaMgr.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
 				LOG.info(".");
 			}
 		} catch (IOException e) {

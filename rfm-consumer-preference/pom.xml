@@ -129,12 +129,12 @@
 			<artifactId>cassandra-driver-core</artifactId>
 			<version>${cassandra-driver-core.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-cassandra</artifactId>
-			<version>${spring.cassandra.version}</version>
-			<scope>provided</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.data</groupId>-->
+<!--			<artifactId>spring-data-cassandra</artifactId>-->
+<!--			<version>${spring.cassandra.version}</version>-->
+<!--			<scope>provided</scope>-->
+<!--		</dependency>-->
 		<!-- Rules -->
 		<dependency>
 			<groupId>org.drools</groupId>

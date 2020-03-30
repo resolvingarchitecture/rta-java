@@ -5,8 +5,8 @@ import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.SimpleStatement;
 import ra.rta.rfm.conspref.models.Group;
+import ra.rta.rfm.conspref.models.KPICustomerSummary;
 import ra.rta.rfm.conspref.models.KPIGroupSummary;
-import ra.rta.rfm.conspref.models.KPIIndividualSummary;
 
 import java.util.UUID;
 
@@ -66,8 +66,8 @@ public class RFMSummaryDataService extends BaseDataService {
         return summary;
     }
 
-    public KPIIndividualSummary getLatestKPICustomerSummary(Group group, UUID adid, int termcode) {
-        KPIIndividualSummary summary = new KPIIndividualSummary();
+    public KPICustomerSummary getLatestKPICustomerSummary(Group group, UUID adid, int termcode) {
+        KPICustomerSummary summary = new KPICustomerSummary();
         summary.setPartner(group);
         summary.setAdId(adid);
         summary.setTermcode(termcode);
@@ -82,8 +82,8 @@ public class RFMSummaryDataService extends BaseDataService {
         return summary;
     }
 
-    public KPIIndividualSummary getKPICustomerSummaryByDate(Group group, UUID adic, int termcode, Integer date) {
-        KPIIndividualSummary summary = new KPIIndividualSummary();
+    public KPICustomerSummary getKPICustomerSummaryByDate(Group group, UUID adic, int termcode, Integer date) {
+        KPICustomerSummary summary = new KPICustomerSummary();
         summary.setPartner(group);
         summary.setAdId(adic);
         summary.setTermcode(termcode);

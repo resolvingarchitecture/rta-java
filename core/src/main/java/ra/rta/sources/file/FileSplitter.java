@@ -2,8 +2,8 @@ package ra.rta.sources.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
-import ra.rta.models.Event;
+import ra.rta.connectors.kafka.KafkaMgr;
+import ra.rta.Event;
 import ra.rta.utilities.JSONUtil;
 import ra.rta.utilities.RandomUtil;
 
@@ -24,7 +24,7 @@ public class FileSplitter extends Thread {
     private int startingLine;
     private Path sourceDir;
     private Path archiveDir;
-    private MessageManager messageManager;
+    private KafkaMgr kafkaMgr;
 
     private boolean terminate = false;
     private boolean completed = false;
@@ -36,7 +36,7 @@ public class FileSplitter extends Thread {
                         int startingLine,
                         Path sourceDir,
                         Path archiveDir,
-                        MessageManager messageManager) {
+                        KafkaMgr kafkaMgr) {
         this.sourceId = sourceId;
         this.dataFileName = dataFileName;
         this.markerFileName = markerFileName;
@@ -44,7 +44,7 @@ public class FileSplitter extends Thread {
         this.startingLine = startingLine;
         this.sourceDir = sourceDir;
         this.archiveDir = archiveDir;
-        this.messageManager = messageManager;
+        this.kafkaMgr = kafkaMgr;
     }
 
     public void terminate() {
@@ -89,7 +89,7 @@ public class FileSplitter extends Thread {
                 event.payloadTransformerClass = payloadTransformerClass;
                 // Add message
                 LOG.info(".");
-                messageManager.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
+                kafkaMgr.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), durable);
                 Files.write(markerFile,(lineNumberReader.getLineNumber()+"").getBytes());
                 totalNumLinesSent++;
             }

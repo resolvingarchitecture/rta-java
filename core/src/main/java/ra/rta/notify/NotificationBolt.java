@@ -28,25 +28,26 @@ package ra.rta.notify;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
-import ra.rta.BaseEventEndBolt;
-import ra.rta.MessageManager;
-import ra.rta.models.Event;
+import ra.rta.BaseEventEmitterBolt;
+import ra.rta.connectors.kafka.KafkaMgr;
+import ra.rta.Event;
 import ra.rta.utilities.JSONUtil;
 
 import java.util.Map;
 
-public class NotificationEndBolt extends BaseEventEndBolt {
+public class NotificationBolt extends BaseEventEmitterBolt {
 
-    private MessageManager messageManager;
+    private KafkaMgr kafkaMgr;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         super.prepare(map, topologyContext, outputCollector);
-        this.messageManager = new MessageManager(map);
+        this.kafkaMgr = KafkaMgr.init(map);
     }
 
     @Override
     public void execute(Event event) throws Exception {
-        messageManager.send("notify", JSONUtil.MAPPER.writeValueAsBytes(event), false);
+        // TODO: Implement Pub/Sub?
+        kafkaMgr.send("notify", JSONUtil.MAPPER.writeValueAsBytes(event), false);
     }
 }

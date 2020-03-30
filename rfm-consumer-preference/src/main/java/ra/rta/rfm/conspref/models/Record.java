@@ -1,6 +1,6 @@
 package ra.rta.rfm.conspref.models;
 
-import ra.rta.models.EventException;
+import ra.rta.EventException;
 
 import java.io.Serializable;
 import java.util.ArrayList;

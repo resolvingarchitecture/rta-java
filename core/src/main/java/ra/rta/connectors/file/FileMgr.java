@@ -24,14 +24,7 @@
 
   For more information, please refer to <http://unlicense.org/>
  */
-package ra.rta.rfm.conspref.publish.file;
+package ra.rta.connectors.file;
 
-import ra.rta.models.Event;
-import ra.rta.rfm.conspref.publish.sinks.Sink;
-
-public class FileSink implements Sink {
-    @Override
-    public void publish(Event event) {
-
-    }
+public class FileMgr {
 }

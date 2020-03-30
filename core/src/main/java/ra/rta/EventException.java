@@ -1,5 +1,6 @@
-package ra.rta.models;
+package ra.rta;
 
+import ra.rta.Event;
 import ra.rta.utilities.RandomUtil;
 
 import java.util.Arrays;

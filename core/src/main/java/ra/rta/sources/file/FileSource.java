@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.MessageManager;
+import ra.rta.connectors.kafka.KafkaMgr;
 
 public class FileSource implements Runnable {
 
@@ -35,11 +35,11 @@ public class FileSource implements Runnable {
             String payloadTransformerClass = (String)args.get("payloadTransformerClass");
 
             LOG.info("sourceId=" + sourceId);
-            MessageManager messageManager = new MessageManager(args);
+            KafkaMgr kafkaMgr = KafkaMgr.init(args);
 
             // Register Shutdown Hook with File Splitter list
             List<FileSplitter> fileSplitters = new ArrayList<>();
-            Runtime.getRuntime().addShutdownHook(new FileSourceShutdown(fileSplitters, messageManager));
+            Runtime.getRuntime().addShutdownHook(new FileSourceShutdown(fileSplitters, kafkaMgr));
 
             // Get source and archive folder paths
             Path sourceDir = Paths.get(inboundFolder);
@@ -83,7 +83,7 @@ public class FileSource implements Runnable {
                                     startingLine,
                                     sourceDir,
                                     archiveDir,
-                                    messageManager);
+                                    kafkaMgr);
                             fileSplitters.add(fileSplitter);
                             fileSplitter.start();
                         }
@@ -149,7 +149,7 @@ public class FileSource implements Runnable {
                             0,
                             sourceDir,
                             archiveDir,
-                            messageManager);
+                            kafkaMgr);
                     fileSplitters.add(fileSplitter);
                     fileSplitter.start();
                 }

@@ -2,7 +2,7 @@ package ra.rta.rfm.conspref.models;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.KPI;
+import ra.rta.classify.KPI;
 
 import java.util.*;
 

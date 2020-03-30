@@ -26,7 +26,7 @@
  */
 package ra.rta.rfm.conspref.enrich;
 
-import ra.rta.models.Enrichable;
+import ra.rta.enrich.Enrichable;
 import ra.rta.models.Enricher;
 
 import java.util.List;

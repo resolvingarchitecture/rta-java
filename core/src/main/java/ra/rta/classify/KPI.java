@@ -1,4 +1,4 @@
-package ra.rta.models;
+package ra.rta.classify;
 
 import java.util.Date;
 import java.util.Objects;
@@ -8,7 +8,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 /**
  * Key Performance Indicator
  */
-public final class KPI implements Cloneable {
+public class KPI implements Cloneable {
 
 	static final long serialVersionUID = 1L;
 

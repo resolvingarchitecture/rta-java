@@ -24,59 +24,54 @@
 
   For more information, please refer to <http://unlicense.org/>
  */
-package ra.rta.rfm.conspref.publish.cassandra;
+package ra.rta.connectors.cassandra;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.cassandra.core.CassandraTemplate;
-import org.springframework.data.cassandra.repository.support.CassandraRepositoryFactory;
-import org.springframework.data.repository.CrudRepository;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public class CassandraRepoMgr {
+public class CassandraMgr {
 
-    private static Logger LOG = LoggerFactory.getLogger(CassandraRepoMgr.class);
+    private static Logger LOG = LoggerFactory.getLogger(CassandraMgr.class);
 
     private String keyspace;
     private String seedNode;
     private Session session;
     private Cluster cluster;
     private String repoClassesStr;
-    private Map<String, CrudRepository> repos = new HashMap<>();
     private boolean initialized = false;
 
-    private static CassandraRepoMgr instance = null;
+    private static CassandraMgr instance = null;
+    private static final Object lock = new Object();
 
-    public static void init(Map map) {
-        instance = new CassandraRepoMgr();
-        instance.keyspace = (String)map.get("topology.keyspace");
-        instance.seedNode = (String)map.get("topology.cassandra.seednode");
-        instance.cluster = Cluster.builder().addContactPoint(instance.seedNode).build();
+    private CassandraMgr(){}
+
+    public static CassandraMgr init(Map map) {
+        synchronized (lock) {
+            if (instance == null) {
+                instance = new CassandraMgr();
+                instance.keyspace = (String) map.get("topology.keyspace");
+                instance.seedNode = (String) map.get("topology.cassandra.seednode");
+                instance.cluster = Cluster.builder().addContactPoint(instance.seedNode).build();
 //			cluster.getConfiguration().getPoolingOptions().setCoreConnectionsPerHost(HostDistance.LOCAL, 12);
 //			cluster.getConfiguration().getPoolingOptions().setCoreConnectionsPerHost(HostDistance.REMOTE, 12);
 //			cluster.getConfiguration().getPoolingOptions().setMaxConnectionsPerHost(HostDistance.LOCAL, 16);
 //			cluster.getConfiguration().getPoolingOptions().setMaxConnectionsPerHost(HostDistance.REMOTE, 16);
-        instance.session = instance.cluster.connect(instance.keyspace);
-        CassandraTemplate template = new CassandraTemplate(instance.session);
-        CassandraRepositoryFactory repoFactory = new CassandraRepositoryFactory(template);
-
-        instance.repoClassesStr = (String)map.get("topology.repositories");
-        String[] repoClasses = instance.repoClassesStr.split(",");
-        for(String repoClass : repoClasses) {
-            try {
-                instance.repos.put(repoClass,(CrudRepository) repoFactory.getRepository(Class.forName(repoClass)));
-            } catch (ClassNotFoundException e) {
-                LOG.warn(e.getLocalizedMessage());
+                instance.session = instance.cluster.connect(instance.keyspace);
             }
         }
+        return instance;
     }
 
-    public static CassandraRepoMgr getInstance() {
+    public static CassandraMgr getInstance() {
         return instance;
+    }
+
+    public Session getSession() {
+        return session;
     }
 
 }

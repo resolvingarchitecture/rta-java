@@ -3,8 +3,8 @@ package ra.rta.rfm.conspref.services.business.tasks;
 import com.google.common.cache.LoadingCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.models.Event;
-import ra.rta.models.KPI;
+import ra.rta.Event;
+import ra.rta.classify.KPI;
 import ra.rta.rfm.conspref.models.*;
 
 import java.util.LinkedHashSet;
@@ -19,8 +19,8 @@ public class IndividualKPIClassifier implements Classifier {
     @Override
     public void classify(Classifiable classifiable, LoadingCache<String, LinkedHashSet<KPI>> exactMatchTermcodeCache) {
         Customer customer = null;
-        if(classifiable instanceof ra.rta.models.Event) {
-            ra.rta.models.Event event = (Event)classifiable;
+        if(classifiable instanceof Event) {
+            Event event = (Event)classifiable;
             if(event.payload.get("individual")!=null) {
                 customer = (Customer)event.payload.get("individual");
             }

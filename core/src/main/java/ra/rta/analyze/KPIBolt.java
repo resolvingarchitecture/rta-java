@@ -10,7 +10,7 @@ import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
 import org.slf4j.LoggerFactory;
 import ra.rta.BaseEventEmitterBolt;
-import ra.rta.models.Event;
+import ra.rta.Event;
 
 /**
  * Use Drools Rules Engine to determine KPIs.

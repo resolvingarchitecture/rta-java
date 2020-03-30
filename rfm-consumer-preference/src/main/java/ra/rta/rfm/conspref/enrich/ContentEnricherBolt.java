@@ -9,12 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ra.rta.BaseEventEmitterBolt;
-import ra.rta.models.Enrichable;
+import ra.rta.enrich.Enrichable;
 import ra.rta.models.Enricher;
-import ra.rta.models.Event;
-import ra.rta.models.EventException;
+import ra.rta.Event;
+import ra.rta.EventException;
 import ra.rta.rfm.conspref.services.business.events.UCIDNotProvidedException;
-import ra.rta.persistence.PersistenceManager;
+import ra.rta.connectors.PersistenceManager;
 
 public class ContentEnricherBolt extends BaseEventEmitterBolt {
 

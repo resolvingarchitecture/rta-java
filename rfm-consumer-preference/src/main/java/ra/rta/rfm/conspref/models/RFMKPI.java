@@ -24,13 +24,29 @@
 
   For more information, please refer to <http://unlicense.org/>
  */
-package ra.rta.rfm.conspref.publish.neo4j;
+package ra.rta.rfm.conspref.models;
 
-import ra.rta.rfm.conspref.publish.sinks.Sink;
+import ra.rta.classify.KPI;
 
-public class Neo4JSink implements Sink {
-    @Override
-    public void publish(String event) {
+public class RFMKPI extends KPI {
 
+    public enum Type {Unknown, Competitive, NonCompetitive}
+
+    public Type type;
+
+    public long recency;
+    public double recencyScore;
+
+    public int frequency;
+    public double frequencyScore;
+
+    public int monetary;
+    public double monetaryScore;
+
+    public RFMKPI() {
+    }
+
+    public RFMKPI(int termcode) {
+        super(termcode);
     }
 }

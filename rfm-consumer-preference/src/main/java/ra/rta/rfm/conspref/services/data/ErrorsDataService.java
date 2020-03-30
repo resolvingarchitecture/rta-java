@@ -5,8 +5,8 @@ import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.SimpleStatement;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ra.rta.models.Event;
-import ra.rta.models.EventException;
+import ra.rta.Event;
+import ra.rta.EventException;
 
 public class ErrorsDataService extends BaseDataService {
 

@@ -1,6 +1,6 @@
 package ra.rta.rfm.conspref.models;
 
-public interface IndividualRelated {
+public interface CustomerRelated {
    Customer getIndividual();
    Boolean isIndividualRelated();
 }

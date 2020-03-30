@@ -31,7 +31,7 @@ import org.apache.storm.task.TopologyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ra.rta.BaseEventEmitterBolt;
-import ra.rta.models.Event;
+import ra.rta.Event;
 import ra.rta.utilities.JSONUtil;
 
 import java.io.File;
@@ -49,27 +49,32 @@ public class FilePublishBolt extends BaseEventEmitterBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         super.prepare(map, topologyContext, outputCollector);
         String dirPath = (String)map.get("topology.publish.file.dir");
-        if(dirPath==null) {
-            LOG.warn("Unable to prepare FilePublishBolt. Please set directory in property: topology.publish.file.dir");
-            return;
-        }
-        publishDir = new File(dirPath);
-        if(!publishDir.exists() && !publishDir.mkdir()) {
-            LOG.warn("Unable to publish to directory; creation failed: "+dirPath);
+        if(dirPath!=null) {
+            publishDir = new File(dirPath);
+            if(!publishDir.exists() && !publishDir.mkdir()) {
+                LOG.warn("Unable to establish publish directory; creation failed: "+dirPath+"; will depend on supplied path in events.");
+            }
         }
     }
 
     @Override
     public void execute(Event event) throws Exception {
         if(publishDir!=null) {
-            File eventFile = new File(publishDir, event.id+"");
-            if(eventFile.createNewFile()) {
+            File eventFile = new File(publishDir, event.id + "");
+            if (eventFile.createNewFile()) {
                 Files.write(Paths.get(eventFile.toURI()), JSONUtil.MAPPER.writeValueAsBytes(event));
             } else {
-                LOG.warn("Unable to create new event file: "+eventFile.getAbsolutePath());
+                LOG.warn("Unable to create new event file using configured path: " + eventFile.getAbsolutePath());
+            }
+        } else if(event.payload.get("filePath")!=null) {
+            File eventFile = new File((String)event.payload.get("filePath"), event.id + "");
+            if (eventFile.createNewFile()) {
+                Files.write(Paths.get(eventFile.toURI()), JSONUtil.MAPPER.writeValueAsBytes(event));
+            } else {
+                LOG.warn("Unable to create new event file using supplied path: " + eventFile.getAbsolutePath());
             }
         } else {
-            LOG.warn("Unable to persist event (id="+event.id+"): directory doesn't exist. Please set with property: topology.publish.file.dir");
+            LOG.warn("Unable to persist event (id="+event.id+"): no configured nor supplied path. Please configure with property: topology.publish.file.dir or provide in event's payload with filePath as key.");
         }
     }
 }
