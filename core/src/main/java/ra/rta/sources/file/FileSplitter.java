@@ -63,7 +63,7 @@ public class FileSplitter extends Thread {
         String[] commandTopicDurabilityTriple = commandTopicDurabilityStr.split("-");
         int command = Integer.parseInt(commandTopicDurabilityTriple[0]);
         String topic = commandTopicDurabilityTriple[1];
-        Boolean durable = Boolean.parseBoolean(commandTopicDurabilityTriple[2]);
+        boolean durable = Boolean.parseBoolean(commandTopicDurabilityTriple[2]);
         long i = System.currentTimeMillis();
         try {
             // Verify that the new
@@ -84,6 +84,7 @@ public class FileSplitter extends Thread {
                 }
                 Event event = new Event();
                 event.id = RandomUtil.nextRandomLong();
+                event.commandId = command;
                 event.sourceId = sourceId;
                 event.rawPayload = line.getBytes();
                 event.payloadTransformerClass = payloadTransformerClass;
