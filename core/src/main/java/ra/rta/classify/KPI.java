@@ -53,16 +53,10 @@ public class KPI implements Cloneable {
 	}
 
 	@Override
-	public Object clone() throws CloneNotSupportedException {
-		super.clone();
-		KPI kpi = new KPI(termcode);
-		kpi.active = active;
-		kpi.id = id;
-		kpi.date = date;
-		kpi.description = description;
-		kpi.determinationDate = determinationDate;
-		kpi.windowDays = windowDays;
-		kpi.save = save;
+	public KPI clone() throws CloneNotSupportedException {
+		KPI kpi = (KPI)super.clone();
+		kpi.date = (Date)date.clone();
+		kpi.determinationDate = (Date)determinationDate.clone();
 		return kpi;
 	}
 }
