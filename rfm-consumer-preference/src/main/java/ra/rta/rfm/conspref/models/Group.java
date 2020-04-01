@@ -10,6 +10,7 @@ public final class Group {
 
 	private static final long serialVersionUID = 1L;
 
+	public int id;
 	public String name;
 	public String core;
 	public Map<String,String> commandMaps = new HashMap<>();
@@ -40,6 +41,6 @@ public final class Group {
 			return false;
 		}
 		Group other = (Group) obj;
-		return Objects.equals(name, other.name);
+		return Objects.equals(id, other.id);
 	}
 }

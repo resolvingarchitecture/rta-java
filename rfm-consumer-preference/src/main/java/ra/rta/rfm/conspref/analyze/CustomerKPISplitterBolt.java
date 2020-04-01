@@ -22,13 +22,13 @@ import com.datastax.driver.core.SimpleStatement;
 import ra.rta.rfm.conspref.utilities.DateUtility;
 
 /**
- * Gets unique list of Individual KPIs tracked and splits on them
+ * Gets unique list of Customer KPIs tracked and splits on them
  */
-public class IndividualKPISplitterBolt extends BaseRichBolt {
+public class CustomerKPISplitterBolt extends BaseRichBolt {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = LoggerFactory.getLogger(IndividualKPISplitterBolt.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CustomerKPISplitterBolt.class);
 
     private OutputCollector outputCollector;
 
@@ -43,10 +43,10 @@ public class IndividualKPISplitterBolt extends BaseRichBolt {
         String cassandraNode = (String)map.get("topology.cassandra.seednode");
         cluster = Cluster.builder().addContactPoint(cassandraNode).build();
         Metadata metadata = cluster.getMetadata();
-        LOG.info("{} Connected to cluster: {}", IndividualKPISplitterBolt.class.getSimpleName(),
+        LOG.info("{} Connected to cluster: {}", CustomerKPISplitterBolt.class.getSimpleName(),
                 metadata.getClusterName());
         for (Host host : metadata.getAllHosts()) {
-            LOG.info("{} Datacenter: {} ; Host: {} Rack: {}", IndividualKPISplitterBolt.class.getSimpleName(),
+            LOG.info("{} Datacenter: {} ; Host: {} Rack: {}", CustomerKPISplitterBolt.class.getSimpleName(),
                     host.getDatacenter(), host.getAddress(), host.getRack());
         }
         session = cluster.connect();
@@ -54,38 +54,38 @@ public class IndividualKPISplitterBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
-        LOG.info("Started {} execution...", IndividualKPISplitterBolt.class.getSimpleName());
-        String partnerName = tuple.getStringByField("name");
+        LOG.info("Started {} execution...", CustomerKPISplitterBolt.class.getSimpleName());
+        Integer gId = tuple.getIntegerByField("gId");
         try {
             Calendar now = Calendar.getInstance();
             now.add(Calendar.DATE, -366);
             int beginningWindowDateInt = DateUtility.dateToInt(now.getTime());
             LOG.info("beginWindowDateInt: "+beginningWindowDateInt);
-            ResultSet rs = session.execute(new SimpleStatement("SELECT adid, termcode, date FROM " + partnerName + ".customer_KPI_frequency;"));
+            ResultSet rs = session.execute(new SimpleStatement("SELECT id, termcode, date FROM customer_KPI_frequency WHERE gId={};",gId));
             long totalSeen = 0;
             long totalWithinWindow = 0;
             long totalEmitted = 0;
-            String hash = null;
+            String mash = null;
             for (Row row : rs) {
                 int date = row.getInt("date");
                 if (date > beginningWindowDateInt) {
-                    UUID adid = row.getUUID("adid");
-                    int termcode = row.getInt("termcode");
-                    String nextHash = adid.toString()+"|"+termcode;
-                    if (!nextHash.equals(hash)) {
-                        outputCollector.emit(new Values(partnerName, adid, termcode));
+                    int cId = row.getInt("cId");
+                    int tCode = row.getInt("tCode");
+                    String nextMsh = cId+"|"+tCode;
+                    if (!nextMsh.equals(mash)) {
+                        outputCollector.emit(new Values(gId, cId, tCode));
                     }
-                    hash = nextHash;
+                    mash = nextMsh;
                 }
                 totalSeen++;
             }
             LOG.info("CustomerKPISplitter Totals: seen="+totalSeen+"; within window="+totalWithinWindow+"; emitted="+totalEmitted);
         } catch (Exception e) {
-            LOG.error(IndividualKPISplitterBolt.class.getSimpleName() + " error: " + e);
+            LOG.error(CustomerKPISplitterBolt.class.getSimpleName() + " error: " + e);
             outputCollector.reportError(e);
         }
         outputCollector.ack(tuple);
-        LOG.info("{} execution completed.", IndividualKPISplitterBolt.class.getSimpleName());
+        LOG.info("{} execution completed.", CustomerKPISplitterBolt.class.getSimpleName());
     }
 
     @Override

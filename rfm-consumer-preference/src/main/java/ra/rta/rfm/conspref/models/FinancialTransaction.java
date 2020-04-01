@@ -2,7 +2,6 @@ package ra.rta.rfm.conspref.models;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.classify.KPI;
 
 import java.util.*;
 
@@ -26,10 +25,9 @@ public class FinancialTransaction {
         Unknown, Check, ACH, OverdraftFee, OnlineBillpay, Mobile, POS, ATM, Teller
     }
 
-	public LinkedHashSet<KPI> kpis = new LinkedHashSet<>();
-
+    public int gId;
+	public int cId;
 	public long id;
-	public long individualId;
 	public Date date;
 	public Status status = Status.Unknown;
 	public Type type = Type.Unknown;

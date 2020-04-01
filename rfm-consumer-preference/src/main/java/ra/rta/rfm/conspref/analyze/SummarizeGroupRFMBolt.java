@@ -1,6 +1,7 @@
 package ra.rta.rfm.conspref.analyze;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -12,12 +13,10 @@ import org.apache.storm.tuple.Tuple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Host;
-import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import ra.rta.connectors.cassandra.CassandraMgr;
 import ra.rta.rfm.conspref.models.KPICustomerSummary;
 import ra.rta.rfm.conspref.models.KPIGroupSummary;
 import ra.rta.rfm.conspref.utilities.DateUtility;
@@ -33,7 +32,6 @@ public class SummarizeGroupRFMBolt extends BaseRichBolt {
 
 	private OutputCollector outputCollector;
 
-	private Cluster cluster;
 	private Session session;
 
 	@Override
@@ -41,81 +39,72 @@ public class SummarizeGroupRFMBolt extends BaseRichBolt {
 	public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 		this.outputCollector = outputCollector;
 		// Cassandra preparation
-		String cassandraNode = (String)map.get("topology.cassandra.seednode");
-		cluster = Cluster.builder().addContactPoint(cassandraNode).build();
-		Metadata metadata = cluster.getMetadata();
-		LOG.info("{} Connected to cluster: {}", SummarizeGroupRFMBolt.class.getSimpleName(),
-				metadata.getClusterName());
-		for (Host host : metadata.getAllHosts()) {
-			LOG.info("{} Datacenter: {}; Host: {}; Rack: {}", SummarizeGroupRFMBolt.class.getSimpleName(),
-					host.getDatacenter(), host.getAddress(), host.getRack());
-		}
-		session = cluster.connect();
+		session = CassandraMgr.init(map).getSession();
 	}
 
 	@Override
 	public void execute(Tuple tuple) {
-		String groupName = tuple.getStringByField("name");
+		int gId = tuple.getIntegerByField("groupId");
 		int termcode = tuple.getIntegerByField("termcode");
-		KPICustomerSummary KPICustomerSummary = (KPICustomerSummary)tuple.getValueByField("summary");
-		KPIGroupSummary KPIGroupSummary = new KPIGroupSummary();
-		KPIGroupSummary.setTermcode(KPICustomerSummary.getTermcode());
-		KPIGroupSummary.setDate(KPICustomerSummary.getDate());
-		KPIGroupSummary.setWindowDays(KPICustomerSummary.getWindowDays());
+		KPICustomerSummary kpiCustomerSummary = (KPICustomerSummary)tuple.getValueByField("summary");
+		KPIGroupSummary kpiGroupSummary = new KPIGroupSummary();
+		kpiGroupSummary.tCode = kpiCustomerSummary.tCode;
+		kpiGroupSummary.date = kpiCustomerSummary.date;
+		kpiGroupSummary.windowDays = kpiCustomerSummary.windowDays;
 		// Update partner_KPI_rfm_windowed
 		try {
 			boolean update = false;
 
 			// Get latest summary
-			ResultSet rs = session.execute("SELECT * FROM "+groupName+".partner_KPI_rfm_windowed where termcode="+ KPICustomerSummary.getTermcode()+" limit 1;");
+			ResultSet rs = session.execute("SELECT * FROM group_KPI_rfm_windowed where termcode="+ kpiCustomerSummary.tCode+" limit 1;");
 			Row row = rs.one();
 			if (row == null) {
-				KPIGroupSummary.setRecencyEarliest(KPICustomerSummary.getRecency());
-				KPIGroupSummary.setRecencyLatest(KPICustomerSummary.getRecency());
-				KPIGroupSummary.setFrequencyLeast(KPICustomerSummary.getFrequency());
-				KPIGroupSummary.setFrequencyMost(KPICustomerSummary.getFrequency());
-				KPIGroupSummary.setMonetaryLeast(KPICustomerSummary.getMonetary());
-				KPIGroupSummary.setMonetaryMost(KPICustomerSummary.getMonetary());
+				kpiGroupSummary.recencyEarliest = kpiCustomerSummary.recency;
+				kpiGroupSummary.recencyLatest = kpiCustomerSummary.recency;
+				kpiGroupSummary.frequencyLeast = kpiCustomerSummary.frequency;
+				kpiGroupSummary.frequencyMost = kpiCustomerSummary.frequency;
+				kpiGroupSummary.monetaryLeast = kpiCustomerSummary.monetary;
+				kpiGroupSummary.monetaryMost = kpiCustomerSummary.monetary;
 				update = true;
 			} else {
-				KPIGroupSummary.setRecencyEarliest(row.getInt("recency_earliest"));
-				KPIGroupSummary.setRecencyLatest(row.getInt("recency_latest"));
-				KPIGroupSummary.setRecencyBucket2Floor(row.getInt("recency_bucket_2_floor"));
-				KPIGroupSummary.setRecencyBucket3Floor(row.getInt("recency_bucket_3_floor"));
-				KPIGroupSummary.setFrequencyLeast(row.getLong("frequency_least"));
-				KPIGroupSummary.setFrequencyMost(row.getLong("frequency_most"));
-				KPIGroupSummary.setFrequencyBucket2Floor(row.getLong("frequency_bucket_2_floor"));
-				KPIGroupSummary.setFrequencyBucket3Floor(row.getLong("frequency_bucket_3_floor"));
-				KPIGroupSummary.setMonetaryLeast(row.getDouble("monetary_least"));
-				KPIGroupSummary.setMonetaryMost(row.getDouble("monetary_most"));
-				KPIGroupSummary.setMonetaryBucket2Floor(row.getDouble("monetary_bucket_2_floor"));
-				KPIGroupSummary.setMonetaryBucket3Floor(row.getDouble("monetary_bucket_3_floor"));
+				kpiGroupSummary.recencyEarliest = row.getInt("recency_earliest");
+				kpiGroupSummary.recencyLatest = row.getInt("recency_latest");
+				kpiGroupSummary.recencyBucket2Floor = row.getInt("recency_bucket_2_floor");
+				kpiGroupSummary.recencyBucket3Floor = row.getInt("recency_bucket_3_floor");
+				kpiGroupSummary.frequencyLeast = row.getLong("frequency_least");
+				kpiGroupSummary.frequencyMost = row.getLong("frequency_most");
+				kpiGroupSummary.frequencyBucket2Floor = row.getLong("frequency_bucket_2_floor");
+				kpiGroupSummary.frequencyBucket3Floor = row.getLong("frequency_bucket_3_floor");
+				kpiGroupSummary.monetaryLeast = row.getDouble("monetary_least");
+				kpiGroupSummary.monetaryMost = row.getDouble("monetary_most");
+				kpiGroupSummary.monetaryBucket2Floor = row.getDouble("monetary_bucket_2_floor");
+				kpiGroupSummary.monetaryBucket3Floor = row.getDouble("monetary_bucket_3_floor");
 
-				if (KPICustomerSummary.getRecency() < KPIGroupSummary.getRecencyEarliest()) {
-					KPIGroupSummary.setRecencyEarliest(KPICustomerSummary.getRecency());
-					update = calculateRecencyBuckets(KPIGroupSummary);
-				} else if (KPICustomerSummary.getRecency() > KPIGroupSummary.getRecencyLatest()) {
-					KPIGroupSummary.setRecencyLatest(KPICustomerSummary.getRecency());
-					update = calculateRecencyBuckets(KPIGroupSummary);
+				if (kpiCustomerSummary.recency < kpiGroupSummary.recencyEarliest) {
+					kpiGroupSummary.recencyEarliest = kpiCustomerSummary.recency;
+					update = calculateRecencyBuckets(kpiGroupSummary);
+				} else if (kpiCustomerSummary.recency > kpiGroupSummary.recencyLatest) {
+					kpiGroupSummary.recencyLatest = kpiCustomerSummary.recency;
+					update = calculateRecencyBuckets(kpiGroupSummary);
 				}
-				if (KPICustomerSummary.getFrequency() < KPIGroupSummary.getFrequencyLeast()) {
-					KPIGroupSummary.setFrequencyLeast(KPICustomerSummary.getFrequency());
-					calculateFrequencyBuckets(KPIGroupSummary); update = true;
-				} else if (KPICustomerSummary.getFrequency() > KPIGroupSummary.getFrequencyMost()) {
-					KPIGroupSummary.setFrequencyMost(KPICustomerSummary.getFrequency());
-					calculateFrequencyBuckets(KPIGroupSummary); update = true;
+				if (kpiCustomerSummary.frequency < kpiGroupSummary.frequencyLeast) {
+					kpiGroupSummary.frequencyLeast = kpiCustomerSummary.frequency;
+					calculateFrequencyBuckets(kpiGroupSummary); update = true;
+				} else if (kpiCustomerSummary.frequency > kpiGroupSummary.frequencyMost) {
+					kpiGroupSummary.frequencyMost = kpiCustomerSummary.frequency;
+					calculateFrequencyBuckets(kpiGroupSummary); update = true;
 				}
-				if (KPICustomerSummary.getMonetary() < KPIGroupSummary.getMonetaryLeast()) {
-					KPIGroupSummary.setMonetaryLeast(KPICustomerSummary.getMonetary());
-					calculateMonetaryBuckets(KPIGroupSummary); update = true;
-				} else if (KPICustomerSummary.getMonetary() > KPIGroupSummary.getMonetaryMost()) {
-					KPIGroupSummary.setMonetaryMost(KPICustomerSummary.getMonetary());
-					calculateMonetaryBuckets(KPIGroupSummary); update = true;
+				if (kpiCustomerSummary.monetary < kpiGroupSummary.monetaryLeast) {
+					kpiGroupSummary.monetaryLeast = kpiCustomerSummary.monetary;
+					calculateMonetaryBuckets(kpiGroupSummary); update = true;
+				} else if (kpiCustomerSummary.monetary > kpiGroupSummary.monetaryMost) {
+					kpiGroupSummary.monetaryMost = kpiCustomerSummary.monetary;
+					calculateMonetaryBuckets(kpiGroupSummary); update = true;
 				}
 			}
 
 			if (update) {
-				session.execute("UPDATE " + groupName + ".partner_KPI_rfm_windowed SET window_days = " + KPIGroupSummary.getWindowDays() + ", recency_earliest = " + KPIGroupSummary.getRecencyEarliest() + ", recency_latest = " + KPIGroupSummary.getRecencyLatest() + ", recency_bucket_2_floor = " + KPIGroupSummary.getRecencyBucket2Floor() + ", recency_bucket_3_floor = " + KPIGroupSummary.getRecencyBucket3Floor() + ", frequency_least = " + KPIGroupSummary.getFrequencyLeast() + ", frequency_most = " + KPIGroupSummary.getFrequencyMost() + ", frequency_bucket_2_floor =" + KPIGroupSummary.getFrequencyBucket2Floor() + ", frequency_bucket_3_floor = " + KPIGroupSummary.getFrequencyBucket3Floor() + ", monetary_least = " + KPIGroupSummary.getMonetaryLeast() + ", monetary_most = " + KPIGroupSummary.getMonetaryMost() + ", monetary_bucket_2_floor = " + KPIGroupSummary.getMonetaryBucket2Floor() + ", monetary_bucket_3_floor = " + KPIGroupSummary.getMonetaryBucket3Floor() +" WHERE termcode = " + KPIGroupSummary.getTermcode() + " AND date = " + KPIGroupSummary.getDate() + ";");
+				session.execute("UPDATE group_KPI_rfm_windowed SET window_days = " + kpiGroupSummary.windowDays + ", recency_earliest = " + kpiGroupSummary.recencyEarliest + ", recency_latest = " + kpiGroupSummary.recencyLatest + ", recency_bucket_2_floor = " + kpiGroupSummary.recencyBucket2Floor + ", recency_bucket_3_floor = " + kpiGroupSummary.recencyBucket3Floor + ", frequency_least = " + kpiGroupSummary.frequencyLeast + ", frequency_most = " + kpiGroupSummary.frequencyMost + ", frequency_bucket_2_floor =" + kpiGroupSummary.frequencyBucket2Floor + ", frequency_bucket_3_floor = " + kpiGroupSummary.frequencyBucket3Floor + ", monetary_least = " + kpiGroupSummary.monetaryLeast + ", monetary_most = " + kpiGroupSummary.monetaryMost + ", monetary_bucket_2_floor = " + kpiGroupSummary.monetaryBucket2Floor + ", monetary_bucket_3_floor = " + kpiGroupSummary.monetaryBucket3Floor +" WHERE gId = "+gId+" AND termcode = " + kpiGroupSummary.tCode + " AND date = " + kpiGroupSummary.date + ";");
 			}
 
 		} catch (Exception e) {
@@ -131,40 +120,28 @@ public class SummarizeGroupRFMBolt extends BaseRichBolt {
 		//
 	}
 
-	private static boolean calculateRecencyBuckets(KPIGroupSummary KPIGroupSummary) throws Exception {
-		boolean updated = false;
-		if (KPIGroupSummary.getRecencyEarliest() > 0) { // Must be a
-			Calendar recencyLatestCal = Calendar.getInstance();
-			recencyLatestCal.setTime(DateUtility.intToDate(KPIGroupSummary.getRecencyLatest()));
-			long recencyWindowLatest = recencyLatestCal.getTimeInMillis();
-
-			Calendar recencyEarliestCal = Calendar.getInstance();
-			recencyEarliestCal.setTime(DateUtility.intToDate(KPIGroupSummary.getRecencyEarliest()));
-			long recencyWindowEarliest = recencyEarliestCal.getTimeInMillis();
-
-			int numberDaysDiffRecency = (int) TimeUnit.MILLISECONDS.toDays(Math.abs(recencyWindowLatest - recencyWindowEarliest));
-			int numberDaysPerBucket = (int) Math.floor(numberDaysDiffRecency / 3);
-			recencyEarliestCal.add(Calendar.DATE, numberDaysPerBucket);
-			KPIGroupSummary.setRecencyBucket2Floor(DateUtility.dateToInt(recencyEarliestCal.getTime()));
-
-			recencyEarliestCal.add(Calendar.DATE, numberDaysPerBucket);
-			KPIGroupSummary.setRecencyBucket3Floor(DateUtility.dateToInt(recencyEarliestCal.getTime()));
-			updated = true;
+	private static boolean calculateRecencyBuckets(KPIGroupSummary sum) throws Exception {
+		if (sum.recencyEarliest > 0) { // Must be a positive
+			long diffRecency = Math.abs(sum.recencyLatest - sum.recencyEarliest);
+			long spreadPerBucket = (long)Math.floor((double)diffRecency / 3);
+			sum.recencyBucket2Floor = sum.recencyEarliest + spreadPerBucket;
+			sum.recencyBucket3Floor = sum.recencyBucket2Floor + spreadPerBucket;
+			return true;
 		}
-		return updated;
+		return false;
 	}
 
-	private static void calculateFrequencyBuckets(KPIGroupSummary KPIGroupSummary) throws Exception {
-		long frequencyRange = KPIGroupSummary.getFrequencyMost() - KPIGroupSummary.getFrequencyLeast();
-		long frequencyPerBucket = (long)Math.floor(frequencyRange / 3);
-		KPIGroupSummary.setFrequencyBucket2Floor(KPIGroupSummary.getFrequencyLeast() + frequencyPerBucket);
-		KPIGroupSummary.setFrequencyBucket3Floor(KPIGroupSummary.getFrequencyBucket2Floor() + frequencyPerBucket);
+	private static void calculateFrequencyBuckets(KPIGroupSummary sum) throws Exception {
+		long frequencyRange = sum.frequencyMost - sum.frequencyLeast;
+		long spreadPerBucket = (long)Math.floor((double)frequencyRange / 3);
+		sum.frequencyBucket2Floor = sum.frequencyLeast + spreadPerBucket;
+		sum.frequencyBucket3Floor = sum.frequencyBucket2Floor + spreadPerBucket;
 	}
 
-	private static void calculateMonetaryBuckets(KPIGroupSummary KPIGroupSummary) throws Exception {
-		double monetaryRange = KPIGroupSummary.getMonetaryMost() - KPIGroupSummary.getMonetaryLeast();
-		double monetaryPerBucket = Math.floor(monetaryRange / 3);
-		KPIGroupSummary.setMonetaryBucket2Floor(KPIGroupSummary.getMonetaryLeast() + monetaryPerBucket);
-		KPIGroupSummary.setMonetaryBucket3Floor(KPIGroupSummary.getMonetaryBucket2Floor() + monetaryPerBucket);
+	private static void calculateMonetaryBuckets(KPIGroupSummary sum) throws Exception {
+		double monetaryRange = sum.monetaryMost - sum.monetaryLeast;
+		double spreadPerBucket = Math.floor(monetaryRange / 3);
+		sum.monetaryBucket2Floor = sum.monetaryLeast + spreadPerBucket;
+		sum.monetaryBucket3Floor = sum.monetaryBucket2Floor + spreadPerBucket;
 	}
 }

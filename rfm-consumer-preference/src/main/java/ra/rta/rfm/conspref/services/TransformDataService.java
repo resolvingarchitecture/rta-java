@@ -1,4 +1,4 @@
-package ra.rta.rfm.conspref.services.data;
+package ra.rta.rfm.conspref.services;
 
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
@@ -13,9 +13,9 @@ public class TransformDataService extends BaseDataService {
         super(session);
     }
 
-    public Map<String, Map<String,Map<String,Object>>> getPartnerTransformMaps(String partnerName) {
+    public Map<String, Map<String,Map<String,Object>>> getGroupTransformMaps(int groupId) {
         Map<String, Map<String,Map<String,Object>>> transformMaps = new HashMap<>();
-        ResultSet rs = session.execute(new SimpleStatement("SELECT * FROM "+partnerName+".transform"));
+        ResultSet rs = session.execute(new SimpleStatement("SELECT * FROM transform where gId="+groupId));
         Iterator<Row> i = rs.iterator();
         while(i.hasNext()) {
             Row row = i.next();

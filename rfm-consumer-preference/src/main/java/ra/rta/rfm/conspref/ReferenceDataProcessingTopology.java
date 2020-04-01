@@ -6,11 +6,13 @@ import org.apache.storm.topology.TopologyBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.rfm.conspref.bolts.AnalyticsBolt;
-import ra.rta.rfm.conspref.classify.ClassificationBolt;
-import ra.rta.rfm.conspref.bolts.ContentEnricherBolt;
+import ra.rta.EventEndBolt;
+import ra.rta.Main;
+import ra.rta.analyze.DroolsBolt;
+import ra.rta.rfm.conspref.classify.WANDClassificationBolt;
+import ra.rta.rfm.conspref.enrich.EnricherBolt;
 import ra.rta.rfm.conspref.publish.PublishBolt;
-import ra.rta.rfm.conspref.bolts.TransformBolt;
+import ra.rta.transform.TransformBolt;
 
 /**
  *
@@ -36,27 +38,30 @@ public class ReferenceDataProcessingTopology extends Main {
 		.setBolt(TransformBolt.class.getSimpleName(), new TransformBolt(), transformParallelism * numberOfWorkers)
 		.localOrShuffleGrouping(KafkaSpout.class.getSimpleName());
 
-		int contentEnricherParallelism = (int) config.get("topology." + name + ".contentenricher.parallelism");
+		int contentEnricherParallelism = (int) config.get("topology." + name + ".enricher.parallelism");
 		builder
-		.setBolt(ContentEnricherBolt.class.getSimpleName(), new ContentEnricherBolt(), contentEnricherParallelism * numberOfWorkers)
+		.setBolt(EnricherBolt.class.getSimpleName(), new EnricherBolt(), contentEnricherParallelism * numberOfWorkers)
 		.localOrShuffleGrouping(TransformBolt.class.getSimpleName());
 
 		int analyticsParallelism = (int) config.get("topology." + name + ".analytics.parallelism");
 		String kBaseName = (String) config.get("topology." + name + ".rules.kBaseName");
 		config.put("topology.rules.kBaseName", kBaseName);
 		builder
-		.setBolt(AnalyticsBolt.class.getSimpleName(), new AnalyticsBolt(), analyticsParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(ContentEnricherBolt.class.getSimpleName());
+		.setBolt(DroolsBolt.class.getSimpleName(), new DroolsBolt(), analyticsParallelism * numberOfWorkers)
+		.localOrShuffleGrouping(EnricherBolt.class.getSimpleName());
 
 		int classificationParallelism = (int) config.get("topology." + name + ".classification.parallelism");
 		builder
-		.setBolt(ClassificationBolt.class.getSimpleName(), new ClassificationBolt(), classificationParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(AnalyticsBolt.class.getSimpleName());
+		.setBolt(WANDClassificationBolt.class.getSimpleName(), new WANDClassificationBolt(), classificationParallelism * numberOfWorkers)
+		.localOrShuffleGrouping(DroolsBolt.class.getSimpleName());
 
 		int publishParallelism = (int) config.get("topology." + name + ".publish.parallelism");
 		builder
 		.setBolt(PublishBolt.class.getSimpleName(), new PublishBolt(), publishParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(ClassificationBolt.class.getSimpleName());
+		.localOrShuffleGrouping(WANDClassificationBolt.class.getSimpleName());
+
+		builder.setBolt(EventEndBolt.class.getSimpleName(), new EventEndBolt(), publishParallelism * numberOfWorkers)
+				.localOrShuffleGrouping(PublishBolt.class.getSimpleName());
 
 		stormTopology = builder.createTopology();
 

@@ -1,28 +1,27 @@
 package ra.rta.rfm.conspref.enrich;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
+import org.joda.time.LocalDate;
+import org.joda.time.Months;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ra.rta.BaseEventEmitterBolt;
-import ra.rta.enrich.Enrichable;
-import ra.rta.models.Enricher;
 import ra.rta.Event;
-import ra.rta.EventException;
-import ra.rta.rfm.conspref.services.business.events.UCIDNotProvidedException;
-import ra.rta.connectors.PersistenceManager;
+import ra.rta.rfm.conspref.models.Record;
 
-public class ContentEnricherBolt extends BaseEventEmitterBolt {
+public class EnricherBolt extends BaseEventEmitterBolt {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger LOG = LoggerFactory.getLogger(ContentEnricherBolt.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EnricherBolt.class);
 
-	private EnricherService enricherService;
 
 	private long maxRetries;
 
@@ -31,22 +30,29 @@ public class ContentEnricherBolt extends BaseEventEmitterBolt {
 	public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 		super.prepare(map, topologyContext, outputCollector);
 //		maxRetries = (Long) map.get("topology.bolts.contentenricher.retries.max");
-		enricherService = new EnricherService();
 	}
 
 	@Override
 	public void execute(Event event) throws Exception {
-		if (event instanceof Enrichable) {
-			Enrichable enrichable = (Enrichable)event;
-			try {
-				List<Enricher> enrichers = enrichable.getEnrichers();
-				for (Enricher enricher : enrichers) {
-					enricher.enrich(enrichable);
-				}
-			} catch (UCIDNotProvidedException e) {
-				EventException error = new EventException(ContentEnricherBolt.class.getSimpleName(), 104, event.id+"", event);
-				PersistenceManager.getErrorsDataService().save(error, event);
+		List<Record> records = (List<Record>)event.payload.get("records");
+		for(Record r : records) {
+			if(r.customer ==null) {
+				LOG.warn("No Individual found; unable to enrich.");
+				return;
 			}
+			if (r.customer.birthYear > 1900 && (r.customer.age < 0 || r.customer.age > 200)) {
+				r.customer.age = Calendar.getInstance().get(Calendar.YEAR) - r.customer.birthYear;
+				r.customer.save = true;
+			}
+			if (r.customer.openDateMonths == null && r.customer.openDate != null) {
+				r.customer.openDateMonths =
+						Months.monthsBetween(
+								new LocalDate(r.customer.openDate).withDayOfMonth(1),
+								new LocalDate(new Date()).withDayOfMonth(1)
+						).getMonths();
+				r.customer.save = true;
+			}
+
 		}
 	}
 

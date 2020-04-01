@@ -1,5 +1,6 @@
 package ra.rta.rfm.conspref.publish;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.storm.task.OutputCollector;
@@ -7,16 +8,17 @@ import org.apache.storm.task.TopologyContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.EventEndBolt;
+import ra.rta.BaseEventEmitterBolt;
 import ra.rta.connectors.cassandra.CassandraMgr;
 import ra.rta.Event;
+import ra.rta.rfm.conspref.models.Record;
 
 /**
  * Publish final results to Cassandra.
  *
  * Handles multiple records.
  */
-public class PublishBolt extends EventEndBolt {
+public class PublishBolt extends BaseEventEmitterBolt {
 
 	private static Logger LOG = LoggerFactory.getLogger(PublishBolt.class);
 
@@ -32,6 +34,7 @@ public class PublishBolt extends EventEndBolt {
 
 	@Override
 	public void execute(Event event) throws Exception {
+		List<Record> records = (List<Record>)event.payload.get("records");
 
 	}
 

@@ -9,18 +9,17 @@ import java.util.List;
 /**
  *
  */
-public class Record implements Serializable {
+public final class Record implements Serializable {
 
 	static final long serialVersionUID = 1L;
 
 	public String raw;
-	public String rawEncoding;
-	public Group group = new Group();
-	public Customer customer = null;
-	public FinancialTransaction financialTransaction;
+	public int gId;
+	public Group group;
+	public int cId;
+	public Customer customer;
+	public FinancialTransaction trx;
 	public List<EventException> eventErrors = new ArrayList<>();
-	public boolean transformed = false;
-	public String json;
 	public Integer tried = 0;
 
 }

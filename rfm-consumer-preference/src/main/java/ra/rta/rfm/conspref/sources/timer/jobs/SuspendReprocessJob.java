@@ -1,9 +1,8 @@
 package ra.rta.rfm.conspref.sources.timer.jobs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ra.rta.rfm.conspref.models.Envelope;
+import ra.rta.Event;
+import ra.rta.connectors.kafka.KafkaMgr;
 import ra.rta.rfm.conspref.models.FinancialTransaction;
-import ra.rta.rfm.conspref.models.Group;
 import ra.rta.rfm.conspref.models.Record;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
@@ -11,23 +10,18 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.rfm.conspref.sources.MessageManager;
-import ra.rta.rfm.conspref.services.data.DataServiceManager;
-import ra.rta.rfm.conspref.services.data.TransactionDataService;
+import ra.rta.rfm.conspref.services.DataServiceMgr;
+import ra.rta.rfm.conspref.services.TransactionDataService;
+import ra.rta.utilities.JSONUtil;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Map;
 
 public class SuspendReprocessJob implements Job {
 
     private static final Logger LOG = LoggerFactory.getLogger(SuspendReprocessJob.class.getSimpleName());
 
     public static final String KAFKA_TOPIC = "kafkaTopic";
-    public static final String KAFKA_CONFIG = "kafkaConfig";
-    public static final String KAFKA_PRODUCER = "kafkaProducer";
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    public static final String KAFKA_MGR = "kafkaMgr";
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
@@ -42,26 +36,23 @@ public class SuspendReprocessJob implements Job {
     public void reprocess(JobDataMap map) throws Exception {
         String msg = "Transaction Suspend Reprocess Job initiated...";
         LOG.info(msg);
-        MessageManager messageManager = (MessageManager) map.get(KAFKA_PRODUCER);
+        KafkaMgr kafkaMgr = (KafkaMgr) map.get(KAFKA_MGR);
         String topic = (String) map.get(KAFKA_TOPIC);
-        DataServiceManager dataServiceManager = (DataServiceManager)map.get(DataServiceManager.class.getSimpleName());
-        Map<String, Group> activePartners = dataServiceManager.getGroupDataService().getAllActivePartnersMap();
-        TransactionDataService transactionDataService = dataServiceManager.getTransactionDataService();
-        for(String partnerName : activePartners.keySet()) {
-            List<FinancialTransaction> suspendedFinancialTransactions = transactionDataService.getSuspended(partnerName);
-            for (FinancialTransaction financialTransaction : suspendedFinancialTransactions) {
-                Envelope envelope = new Envelope();
-                envelope.getHeader().setCommand("TransactionSuspendReprocess");
+        DataServiceMgr dataServiceMgr = (DataServiceMgr)map.get(DataServiceMgr.class.getSimpleName());
+        List<Integer> activeGroups = dataServiceMgr.getGroupDataService().getAllActiveGroups();
+        TransactionDataService transactionDataService = dataServiceMgr.getTransactionDataService();
+        for(int gId : activeGroups) {
+            List<FinancialTransaction> suspendedFinancialTransactions = transactionDataService.getSuspended(gId);
+            for (FinancialTransaction trx : suspendedFinancialTransactions) {
+                Event event = new Event();
+                event.sourceId = 15; // SuspendReprocessJob
+                event.commandId = 1200; // TransactionSuspendReprocess
                 Record record = new Record();
-                envelope.getBody().getRecords().add(record);
-                record.getGroup().setName(partnerName);
-                record.setTransaction(financialTransaction);
-                record.setTransformed(true);
-                transactionDataService.loadSuspended(financialTransaction);
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                MAPPER.writeValue(os, envelope);
+                record.gId = gId;
+                record.trx = trx;
+                event.payload.put("record",record);
                 LOG.info(".");
-                messageManager.send(topic, new String(os.toByteArray()), false);
+                kafkaMgr.send(topic, JSONUtil.MAPPER.writeValueAsBytes(event), false);
                 msg = "Transaction Suspend Reprocess Job service operation signal sent.";
                 LOG.info(msg);
             }

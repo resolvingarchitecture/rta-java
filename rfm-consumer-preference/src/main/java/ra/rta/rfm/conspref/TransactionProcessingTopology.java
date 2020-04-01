@@ -4,11 +4,14 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.storm.kafka.spout.KafkaSpout;
 import org.apache.storm.topology.TopologyBuilder;
 import org.apache.storm.tuple.Fields;
-import ra.rta.rfm.conspref.bolts.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ra.rta.rfm.conspref.classify.ClassificationBolt;
+import ra.rta.Main;
+import ra.rta.analyze.DroolsBolt;
+import ra.rta.rfm.conspref.classify.WANDClassificationBolt;
+import ra.rta.rfm.conspref.enrich.EnricherBolt;
 import ra.rta.rfm.conspref.publish.PublishBolt;
+import ra.rta.transform.TransformBolt;
 
 /**
  * Process transactions.
@@ -34,22 +37,22 @@ public class TransactionProcessingTopology extends Main {
 		.localOrShuffleGrouping(KafkaSpout.class.getSimpleName());
 
 		int classificationParallelism = (Integer) config.get("topology." + name + ".classification.parallelism");
-		builder.setBolt(ClassificationBolt.class.getSimpleName(), new ClassificationBolt(), classificationParallelism * numberOfWorkers)
+		builder.setBolt(WANDClassificationBolt.class.getSimpleName(), new WANDClassificationBolt(), classificationParallelism * numberOfWorkers)
 		.fieldsGrouping(TransformBolt.class.getSimpleName(), new Fields("description"));
 
-		int contentEnricherParallelism = (Integer) config.get("topology." + name + ".contentenricher.parallelism");
-		builder.setBolt(ContentEnricherBolt.class.getSimpleName(), new ContentEnricherBolt(), contentEnricherParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(ClassificationBolt.class.getSimpleName());
+		int contentEnricherParallelism = (Integer) config.get("topology." + name + ".enricher.parallelism");
+		builder.setBolt(EnricherBolt.class.getSimpleName(), new EnricherBolt(), contentEnricherParallelism * numberOfWorkers)
+		.localOrShuffleGrouping(WANDClassificationBolt.class.getSimpleName());
 
 		int analyticsParallelism = (Integer) config.get("topology." + name + ".analytics.parallelism");
 		String kBaseName = (String) config.get("topology." + name + ".rules.kBaseName");
 		config.put("topology.rules.kBaseName", kBaseName);
-		builder.setBolt(AnalyticsBolt.class.getSimpleName(), new AnalyticsBolt(), analyticsParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(ContentEnricherBolt.class.getSimpleName());
+		builder.setBolt(DroolsBolt.class.getSimpleName(), new DroolsBolt(), analyticsParallelism * numberOfWorkers)
+		.localOrShuffleGrouping(EnricherBolt.class.getSimpleName());
 
 		int publishParallelism = (Integer) config.get("topology." + name + ".publish.parallelism");
 		builder.setBolt(PublishBolt.class.getSimpleName(), new PublishBolt(), publishParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(AnalyticsBolt.class.getSimpleName());
+		.localOrShuffleGrouping(DroolsBolt.class.getSimpleName());
 
 		stormTopology =  builder.createTopology();
 

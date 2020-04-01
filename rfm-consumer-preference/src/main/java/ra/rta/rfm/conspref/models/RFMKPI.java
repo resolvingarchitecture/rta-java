@@ -43,10 +43,18 @@ public class RFMKPI extends KPI {
     public int monetary;
     public double monetaryScore;
 
+    public KPICustomerSummary customerSummary;
+    public KPIGroupSummary groupSummary;
+
     public RFMKPI() {
     }
 
     public RFMKPI(int termcode) {
         super(termcode);
+    }
+
+    @Override
+    public RFMKPI clone() throws CloneNotSupportedException {
+        return (RFMKPI)super.clone();
     }
 }

@@ -7,9 +7,10 @@ import org.apache.storm.tuple.Fields;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ra.rta.rfm.conspref.analyze.IndividualKPISplitterBolt;
+import ra.rta.Main;
+import ra.rta.rfm.conspref.analyze.CustomerKPISplitterBolt;
 import ra.rta.rfm.conspref.analyze.GroupSplitterBolt;
-import ra.rta.rfm.conspref.analyze.SummarizeIndividualRFMBolt;
+import ra.rta.rfm.conspref.analyze.SummarizeCustomerRFMBolt;
 import ra.rta.rfm.conspref.analyze.SummarizeGroupRFMBolt;
 
 /**
@@ -33,17 +34,17 @@ public class RFMSummarizationProcessingTopology extends Main {
 
 		builder.setBolt(GroupSplitterBolt.class.getSimpleName(), new GroupSplitterBolt(), 1).shuffleGrouping(KafkaSpout.class.getSimpleName());
 
-		int customerKPISplitterParallelism = (Integer) config.get("topology." + name + ".customerKPIsplitter.parallelism");
-		builder.setBolt(IndividualKPISplitterBolt.class.getSimpleName(), new IndividualKPISplitterBolt(), customerKPISplitterParallelism * numberOfWorkers)
+		int customerKPISplitterParallelism = (Integer) config.get("topology." + name + ".customerkpisplitter.parallelism");
+		builder.setBolt(CustomerKPISplitterBolt.class.getSimpleName(), new CustomerKPISplitterBolt(), customerKPISplitterParallelism * numberOfWorkers)
 		.shuffleGrouping(GroupSplitterBolt.class.getSimpleName());
 
 		int summarizeCustomerRFMParallelism = (Integer) config.get("topology." + name + ".summarizecustomerrfm.parallelism");
-		builder.setBolt(SummarizeIndividualRFMBolt.class.getSimpleName(), new SummarizeIndividualRFMBolt(), summarizeCustomerRFMParallelism * numberOfWorkers)
-		.localOrShuffleGrouping(IndividualKPISplitterBolt.class.getSimpleName());
+		builder.setBolt(SummarizeCustomerRFMBolt.class.getSimpleName(), new SummarizeCustomerRFMBolt(), summarizeCustomerRFMParallelism * numberOfWorkers)
+		.localOrShuffleGrouping(CustomerKPISplitterBolt.class.getSimpleName());
 
 		int summarizePartnerRFMParallelism = (Integer) config.get("topology." + name + ".summarizepartnerrfm.parallelism");
 		builder.setBolt(SummarizeGroupRFMBolt.class.getSimpleName(), new SummarizeGroupRFMBolt(), summarizePartnerRFMParallelism * numberOfWorkers)
-		.fieldsGrouping(SummarizeIndividualRFMBolt.class.getSimpleName(), new Fields("name", "termcode"));
+		.fieldsGrouping(SummarizeCustomerRFMBolt.class.getSimpleName(), new Fields("name", "termcode"));
 
 		stormTopology =  builder.createTopology();
 

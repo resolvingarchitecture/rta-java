@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 import org.quartz.Job;
@@ -23,13 +22,12 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ra.rta.rfm.conspref.classify.WANDMgr;
 import ra.rta.rfm.conspref.models.ChaseFailure;
 import ra.rta.rfm.conspref.models.ExactMatchFailure;
-import ra.rta.rfm.conspref.models.Group;
 import ra.rta.rfm.conspref.utilities.DateUtility;
-import ra.rta.rfm.conspref.services.data.DataServiceManager;
-import ra.rta.rfm.conspref.services.data.GroupDataService;
-import ra.rta.rfm.conspref.services.data.WANDDataService;
+import ra.rta.rfm.conspref.services.DataServiceMgr;
+import ra.rta.rfm.conspref.services.GroupDataService;
 
 public class WANDPostJob implements Job {
 
@@ -46,38 +44,40 @@ public class WANDPostJob implements Job {
 
 	public void postToWAND(JobDataMap map) throws Exception {
 		String msg = WANDPostJob.class.getSimpleName()+" started...";
+		Map<String, String> args = (Map<String, String>) map.get("props");
+		DataServiceMgr dataMgr = DataServiceMgr.init(args);
+		WANDMgr wandMgr = WANDMgr.init(args);
+
 		Date today = new Date();
 		String fileDate = DateUtility.timestampToSimpleDateStringWithSeparator(today, "_");
 		LOG.info(msg);
 		System.out.println(msg);
 		String wandPostPathString = (String)map.get("wandPostPath");
 		String tempPostPathString = "/tmp";
-		GroupDataService groupDataService = DataServiceManager.getGroupDataService();
-		WANDDataService wandDataService = DataServiceManager.getWandDataService();
+		GroupDataService groupDataService = dataMgr.getGroupDataService();
 		// Get list of active Partners
-		Map<String, Group> partners = groupDataService.getAllActivePartnersMap();
-		Set<String> partnerNames = partners.keySet();
+		List<Integer> gIds = groupDataService.getAllActiveGroups();
 		InputStream is = null;
 		GZIPOutputStream os = null;
-		for(String partnerName : partnerNames) {
+		for(Integer gId : gIds) {
 			// Select term codes yet to be sent
 			// Create csv files in staging area to send
-			Path exactMatchFailuresCSV = FileSystems.getDefault().getPath(tempPostPathString, partnerName+"_suspend_"+fileDate+".csv");
+			Path exactMatchFailuresCSV = FileSystems.getDefault().getPath(tempPostPathString, "group_"+gId+"_suspend_"+fileDate+".csv");
 			String exactMatchFailuresHeader = "tradename|type|vehicle|count|first_seen|last_seen\n";
 			Files.write(exactMatchFailuresCSV, exactMatchFailuresHeader.getBytes(), StandardOpenOption.CREATE_NEW);
 			BufferedWriter writer = Files.newBufferedWriter(exactMatchFailuresCSV, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-			List<ExactMatchFailure> exactMatchFailures = wandDataService.getExactMatchFailures(partnerName);
+			List<ExactMatchFailure> exactMatchFailures = wandMgr.getExactMatchFailures(gId);
 			for (ExactMatchFailure e : exactMatchFailures) {
 				// Append failure to csv file
-				writer.write(e.getTradename() + "|" + e.getType() + "|" + e.getVehicle() + "|" + e.getCount() + "|" + e.getFirstSeen() + "|" + e.getLastSeen() + "\n");
+				writer.write(e.tradename + "|" + e.type + "|" + e.vehicle + "|" + e.count + "|" + e.firstSeen + "|" + e.lastSeen + "\n");
 				writer.flush();
 				// Update each posted attribute to true
-				e.setPosted(true);
-				wandDataService.save(partnerName, e);
+				e.posted = true;
+				wandMgr.save(gId, e);
 			}
 			// Compress
 			is = Files.newInputStream(exactMatchFailuresCSV);
-			Path exactMatchFailuresCSVGZ =  FileSystems.getDefault().getPath(tempPostPathString, partnerName+"_suspend_"+fileDate+".csv.gz");
+			Path exactMatchFailuresCSVGZ =  FileSystems.getDefault().getPath(tempPostPathString, "group_"+gId+"_suspend_"+fileDate+".csv.gz");
 			os = new GZIPOutputStream(Files.newOutputStream(exactMatchFailuresCSVGZ,StandardOpenOption.CREATE_NEW));
 			int len; byte[] buffer = new byte[1024];
 			while((len = is.read(buffer)) > 0) {
@@ -91,22 +91,22 @@ public class WANDPostJob implements Job {
 			// Move
 			Files.move(exactMatchFailuresCSVGZ, Paths.get(wandPostPathString + exactMatchFailuresCSVGZ.getFileName()), StandardCopyOption.REPLACE_EXISTING);
 
-			Path chaseFailuresCSV = FileSystems.getDefault().getPath(tempPostPathString, partnerName+"_KPI_suspend_"+fileDate+".csv");
+			Path chaseFailuresCSV = FileSystems.getDefault().getPath(tempPostPathString, "group_"+gId+"_KPI_suspend_"+fileDate+".csv");
 			String chaseFailuresHeader = "term_code|frequency|trans_frequency|term_desc|type|vehicle|first_seen|last_seen\n";
 			Files.write(chaseFailuresCSV, chaseFailuresHeader.getBytes(), StandardOpenOption.CREATE_NEW);
 			writer = Files.newBufferedWriter(chaseFailuresCSV, Charset.forName("UTF-8"), StandardOpenOption.APPEND);
-			List<ChaseFailure> chaseFailures = wandDataService.getChaseFailures(partnerName);
+			List<ChaseFailure> chaseFailures = wandMgr.getChaseFailures(gId);
 			for (ChaseFailure c : chaseFailures) {
 				// Append failure to csv file
-				writer.write(c.getTermCode() + "|" + c.getFrequency() + "|" + c.getTransFrequency() + "|" + c.getTermDesc() + "|" + c.getType() + "|" + c.getVehicle() + "|" + c.getVehicle() + "|" + c.getFirstSeen() + "|" + c.getLastSeen() + "\n");
+				writer.write(c.termCode + "|" + c.frequency + "|" + c.transFrequency + "|" + c.termDesc + "|" + c.type + "|" + c.vehicle + "|" + c.firstSeen + "|" + c.lastSeen + "\n");
 				writer.flush();
 				// Update each posted attribute to true
-				c.setPosted(true);
-				wandDataService.save(partnerName, c);
+				c.posted = true;
+				wandMgr.save(gId, c);
 			}
 			// Compress
 			is = Files.newInputStream(chaseFailuresCSV);
-			Path chaseFailuresCSVGZ =  FileSystems.getDefault().getPath(tempPostPathString, partnerName+"_KPI_suspend_"+fileDate+".csv.gz");
+			Path chaseFailuresCSVGZ =  FileSystems.getDefault().getPath(tempPostPathString, "group_"+gId+"_KPI_suspend_"+fileDate+".csv.gz");
 			os = new GZIPOutputStream(Files.newOutputStream(chaseFailuresCSVGZ,StandardOpenOption.CREATE_NEW));
 			buffer = new byte[1024];
 			while((len = is.read(buffer)) > 0) {
@@ -129,12 +129,9 @@ public class WANDPostJob implements Job {
 	public static void main(String[] args) throws Exception {
 		Map<String,String> properties = new HashMap<>();
 		properties.put("topology.cassandra.seednode","165.13.51.145");
-		DataServiceManager.setProperties(properties);
-		String wandPostPath = "/tmp/end/";
-
 		JobDataMap wandPostJobDataMap = new JobDataMap();
-		wandPostJobDataMap.put("wandPostPath", wandPostPath);
-
+		wandPostJobDataMap.put("wandPostPath", "/tmp/end/");
+		wandPostJobDataMap.put("props", properties);
 		new WANDPostJob().postToWAND(wandPostJobDataMap);
 	}
 }

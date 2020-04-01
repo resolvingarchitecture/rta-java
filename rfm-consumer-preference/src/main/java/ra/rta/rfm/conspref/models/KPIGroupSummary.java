@@ -6,13 +6,14 @@ public class KPIGroupSummary {
 
 	static final long serialVersionUID = 1L;
 
-	public int termcode;
-	public int date;
+	public int gId;
+	public int tCode;
+	public long date;
 	public int windowDays = 365;
-	public int recencyEarliest = 0;
-	public int recencyLatest = 0;
-	public int recencyBucket2Floor = 0;
-	public int recencyBucket3Floor = 0;
+	public long recencyEarliest = 0;
+	public long recencyLatest = 0;
+	public long recencyBucket2Floor = 0;
+	public long recencyBucket3Floor = 0;
 	public long frequencyLeast = 0;
 	public long frequencyMost = 0;
 	public long frequencyBucket2Floor = 0;

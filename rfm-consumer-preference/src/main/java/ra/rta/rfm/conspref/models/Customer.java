@@ -4,11 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import ra.rta.classify.KPIClassifiable;
 import ra.rta.classify.KPI;
-import ra.rta.enrich.Enrichable;
 
-public final class Customer implements KPIClassifiable, Enrichable {
+public final class Customer {
 
 	static final long serialVersionUID = 1L;
 
@@ -24,8 +22,8 @@ public final class Customer implements KPIClassifiable, Enrichable {
 	public Set<KPI> kpis = new HashSet<>();
 	public List<CustomerInteraction> customerInteractions = new ArrayList<>();
 
-	public long id;
-	public long gId;
+	public int id;
+	public int gId;
 	public Date openDate;
 	public Integer openDateMonths;
 	public Date closeDate;
@@ -55,18 +53,6 @@ public final class Customer implements KPIClassifiable, Enrichable {
 	public Integer businessNumEmployees;
 
 	public boolean save = false;
-
-	@Override
-	public List<KPI> classify(Map<String, LinkedHashSet<? extends KPI>> exactMatchTermcodeCache) throws Exception {
-		List<KPI> currentKPIs = new ArrayList<>();
-
-		return currentKPIs;
-	}
-
-	@Override
-	public void enrich(Map<String, Object> input) throws Exception {
-
-	}
 
 	public void addKPI(KPI KPI) {
 		kpis.add(KPI);

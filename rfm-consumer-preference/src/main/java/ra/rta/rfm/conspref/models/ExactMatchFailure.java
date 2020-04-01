@@ -6,12 +6,8 @@ public class ExactMatchFailure {
     public String type;
     public String vehicle;
     public int count = 0;
-    public String firstSeen;
-    public String lastSeen;
+    public long firstSeen;
+    public long lastSeen;
     public boolean posted;
-
-    public ExactMatchFailure(String tradename) {
-        this.tradename = tradename;
-    }
 
 }

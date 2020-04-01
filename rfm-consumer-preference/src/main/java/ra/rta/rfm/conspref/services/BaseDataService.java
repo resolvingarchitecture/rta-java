@@ -1,4 +1,4 @@
-package ra.rta.rfm.conspref.services.data;
+package ra.rta.rfm.conspref.services;
 
 import com.datastax.driver.core.Session;
 
