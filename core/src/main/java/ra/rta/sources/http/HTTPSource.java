@@ -41,7 +41,7 @@ class HTTPSource extends HttpServlet {
       String param = (String)initParams.nextElement();
       params.put(param, config.getInitParameter(param));
     }
-    kafkaMgr = new KafkaMgr(params);
+    kafkaMgr = KafkaMgr.init(params);
     topic = (String)params.get("topic");
     durable = (Boolean)params.get("durable");
     sourceId = (Long)params.get("sourceId");

@@ -77,10 +77,15 @@ public class FileSplitter extends Thread {
             String line;
             // Send Each Line to Kafka Producer and Sleep
             int totalNumLinesSent = 0;
+            // Try mark to skip ahead as it should be more performant than reading and skipping below
+            if(startingLine>0 && lineNumberReader.markSupported()) {
+                lineNumberReader.mark(startingLine);
+                lineNumberReader.reset();
+            }
             while ((line = lineNumberReader.readLine()) != null && !terminate) {
                 if(lineNumberReader.getLineNumber() < startingLine)
                 {
-                    continue; // Fast-forward to starting line
+                    continue; // Fast-forward to starting line (mark didn't work or not supported)
                 }
                 Event event = new Event();
                 event.id = RandomUtil.nextRandomLong();

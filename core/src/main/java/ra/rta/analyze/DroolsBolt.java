@@ -15,7 +15,7 @@ import ra.rta.Event;
 /**
  * Use Drools Rules Engine to determine KPIs.
  */
-public class KPIBolt extends BaseEventEmitterBolt {
+public class DroolsBolt extends BaseEventEmitterBolt {
 
 	private static final long serialVersionUID = 1L;
 

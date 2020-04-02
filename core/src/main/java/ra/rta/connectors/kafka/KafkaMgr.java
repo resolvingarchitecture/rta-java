@@ -6,6 +6,7 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -24,6 +25,15 @@ public final class KafkaMgr {
 
     public static KafkaMgr getInstance() {
         return instance;
+    }
+
+    public static KafkaMgr init(String[] args) {
+        Map<String,Object> map = new HashMap<>();
+        for(String arg :args){
+            String[] tuple = arg.split("=");
+            map.put(tuple[0].trim(), tuple[1].trim());
+        }
+        return init(map);
     }
 
     public static KafkaMgr init(Map<String,Object> map) {

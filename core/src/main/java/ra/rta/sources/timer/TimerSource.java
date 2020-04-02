@@ -36,7 +36,7 @@ public class TimerSource implements Runnable {
 		c.timeDivision1 = Integer.parseInt(args[i++]);
 		c.timeDivision2 = Integer.parseInt(args[i++]);
 		c.props.put("topology.cassandra.seednode",args[i++]);
-		c.kafkaMgr = new KafkaMgr(c.props);
+		c.kafkaMgr = KafkaMgr.init(c.props);
 
 		TimerSource timerSource = new TimerSource(c);
 		timerSource.run();

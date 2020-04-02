@@ -58,7 +58,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 		this.durable = durable;
 		Map<String,Object> args = new HashMap<>();
 		args.put("topology.kafka.broker.list", messageBrokerList);
-		kafkaMgr = new KafkaMgr(args);
+		kafkaMgr = KafkaMgr.init(args);
 	}
 
 	public void init(String... args) {
@@ -70,7 +70,7 @@ public class FTPSource extends DefaultFtplet implements Runnable {
 		commandId = Integer.parseInt(args[i++]);
 		topic = args[i++];
 		durable = "durable".equals(args[i++]);
-		kafkaMgr = new KafkaMgr(params);
+		kafkaMgr = KafkaMgr.init(args);
 	}
 
 	@Override

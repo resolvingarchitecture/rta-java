@@ -1,5 +1,7 @@
 package ra.rta;
 
+import ra.rta.utilities.RandomUtil;
+
 import java.io.Serializable;
 import java.util.Map;
 
@@ -16,4 +18,11 @@ public class Event implements Serializable {
     public String payloadTransformerClass;
     public Map<String,Object> payload;
 
+    public Event() {
+        id = RandomUtil.nextRandomLong();
+    }
+
+    public Event(long id) {
+        this.id = id;
+    }
 }

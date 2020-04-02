@@ -41,8 +41,6 @@ public class CassandraMgr {
     private String seedNode;
     private Session session;
     private Cluster cluster;
-    private String repoClassesStr;
-    private boolean initialized = false;
 
     private static CassandraMgr instance = null;
     private static final Object lock = new Object();

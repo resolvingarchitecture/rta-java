@@ -13,17 +13,17 @@ public class EventException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	private long id;
-	private Date timestamp;
-	private String component;
-    private int code;
-	private String message;
-	private Event event;
+	public long id;
+	public long timestamp;
+	public String component;
+	public int code;
+	public String message;
+	public Event event;
 
 	public EventException(String component, int code, String message, Event event) {
 		super(message);
 		id = RandomUtil.nextRandomLong();
-		timestamp = new Date();
+		timestamp = new Date().getTime();
         this.code = code;
 		this.component = component;
 		this.message = message;
@@ -33,30 +33,5 @@ public class EventException extends Exception {
 	public EventException(String component, int code, String message, Event event, Throwable throwable) {
 		this(component, code, message, event);
 		this.message += "; Stack: "+ Arrays.toString(throwable.getStackTrace())+"; Throwable Localized Message: "+throwable.getLocalizedMessage();
-	}
-
-	public long getId() {
-		return id;
-	}
-
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	public String getComponent() {
-		return component;
-	}
-
-    public int getCode() {
-        return code;
-    }
-
-    @Override
-	public String getMessage() {
-		return message;
-	}
-
-	public Event getEvent() {
-		return event;
 	}
 }
