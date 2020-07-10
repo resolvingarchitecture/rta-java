@@ -17,12 +17,6 @@
 		<name>Resolving Architecture</name>
 		<url>https://resolvingarchitecture.io</url>
 	</organization>
-	<licenses>
-		<license>
-			<name>Unlicense</name>
-			<url>https://unlicense.org/</url>
-		</license>
-	</licenses>
 	<developers>
 		<developer>
 			<name>Brian Taylor</name>
